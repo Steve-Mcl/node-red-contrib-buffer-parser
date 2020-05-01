@@ -57,7 +57,8 @@ copies or substantial portions of the Software.
         },
         oneditprepare: function () {
             var sti = setupTypedInput.bind(this);
-            sti('data', ['msg', 'flow', 'global', 'bin'], 'msg');//data
+            //sti('data', ['msg', 'flow', 'global', 'bin'], 'msg'); //data - dont permit flow or global (anti-pattern)
+            sti('data', ['msg', 'json', 'bin'], 'msg');//data
             sti('specification', ['msg', 'flow', 'global', 'json'], 'json');//specification
         }
     });

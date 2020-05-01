@@ -28,7 +28,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
 * You can specify the same offset many times to convert the same piece of data several times
 * The data can be byte swapped one or more times.  16, 32 or 64 bit swaps are possible. The byte swaps are done prior to any data conversions like LE or BE functions (sometimes it is necessary to do multiple swaps) 
 * The output can be sent in any `msg` property.  e.g. you can send results out in `msg.my.nested.property`.  This has the advantage of leaving the original payload in tact.
-* Input data can come from not only a msg property but also a flow or global property
+* Input data can come from any msg property (not limited to `msg.payload`)
 * Input data can be a 16bit array (common plc data format) simplifying working with PLC type data arrays
 * Output results can be multiple messages as `topic` and `payload` 
   * ideal for taking PLC data and sending it directly to MQTT
