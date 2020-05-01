@@ -1,12 +1,12 @@
 node-red-contrib-buffer-parser
 ==============================
 
-A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byteswapping and much more.
+A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
 
 
 Summary of functionality
 ------------------------
-* Setup a specification and convert data to...
+* Setup a specification and convert multiple parts of an array or buffer to...
   * int, int8, byte,
   * int16, int16le, int16be, uint16, uint16le, uint16be,
   * int32, int32le, int32be, uint32, uint32le, uint32be,
@@ -23,14 +23,13 @@ Summary of functionality
 * Input data can come from not only a msg property but also a flow or global property
 * Input data can be a 16bit array (common plc data format) simplifying working with PLC type data arrays
 * Output results can be multiple messages as ``topic` and `payload` 
-  - ideal for taking PLC data and seding it directly to MQTT
+  - ideal for taking PLC data and sending it directly to MQTT
 * Output results can be a single msg style output
   * ideal for converting multiple different data elements into one object to pass on to perhaps a template node for preparing a SQL or HTML statement using {{mustache}} formatting
 
 
 Install
 -------
-
 
 #### Pallet Manager...
 
@@ -47,19 +46,18 @@ Alternatively, install from a folder containing the source
     npm install c:/source/node-red-contrib-buffer-parser
 
 
-
 Usage
 -----
 
 example flow...
 
 ``` json
-[{"id":"7123f626.1adce8","type":"data-parser","z":"23406c97.6c35b4","name":"no swap","data":"[97,98,99,100,101,102,103,104,105,106,107,108,109,109,111,112,113,114,115,116,117,118,119,120,121,122,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12]","dataType":"bin","specification":"{\"options\":{\"byteSwap\":false},\"items\":[{\"name\":\"myInt\",\"type\":\"int\",\"offset\":4},{\"name\":\"myInt16Array_LE\",\"type\":\"int16le\",\"offset\":26,\"length\":6},{\"name\":\"myInt16Array_BE\",\"type\":\"int16be\",\"offset\":26,\"length\":6},{\"name\":\"uint32s\",\"type\":\"uint32\",\"offset\":0,\"length\":4},{\"name\":\"floats\",\"type\":\"float\",\"offset\":0,\"length\":4},{\"name\":\"doubles\",\"type\":\"double\",\"offset\":0,\"length\":2},{\"name\":\"myString\",\"type\":\"string\",\"offset\":0,\"length\":5},{\"name\":\"fullString\",\"type\":\"string\",\"offset\":0,\"length\":26}]}","specificationType":"json","x":400,"y":320,"wires":[["322f557.fabc9aa"]],"icon":"font-awesome/fa-cogs"},{"id":"d97fb8a3.64fe68","type":"inject","z":"23406c97.6c35b4","name":"just a trigger","topic":"","payload":"true","payloadType":"bool","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":130,"y":320,"wires":[["7123f626.1adce8"]]},{"id":"322f557.fabc9aa","type":"debug","z":"23406c97.6c35b4","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","x":770,"y":320,"wires":[]},{"id":"be610ea2.f82a8","type":"data-parser","z":"23406c97.6c35b4","name":"byte swap","data":"[97,98,99,100,101,102,103,104,105,106,107,108,109,109,111,112,113,114,115,116,117,118,119,120,121,122,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12]","dataType":"bin","specification":"{\"options\":{\"byteSwap\":true},\"items\":[{\"name\":\"myInt\",\"type\":\"int\",\"offset\":4},{\"name\":\"myInt16Array_LE\",\"type\":\"int16le\",\"offset\":26,\"length\":6},{\"name\":\"myInt16Array_BE\",\"type\":\"int16be\",\"offset\":26,\"length\":6},{\"name\":\"uint32s\",\"type\":\"uint32\",\"offset\":0,\"length\":4},{\"name\":\"floats\",\"type\":\"float\",\"offset\":0,\"length\":4},{\"name\":\"doubles\",\"type\":\"double\",\"offset\":0,\"length\":2},{\"name\":\"myString\",\"type\":\"string\",\"offset\":0,\"length\":5},{\"name\":\"fullString\",\"type\":\"string\",\"offset\":0,\"length\":26}]}","specificationType":"json","x":400,"y":380,"wires":[["d9e79dcd.936c4"]]},{"id":"d9e79dcd.936c4","type":"debug","z":"23406c97.6c35b4","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","x":770,"y":380,"wires":[]},{"id":"7530b240.16fe8c","type":"inject","z":"23406c97.6c35b4","name":"just a trigger","topic":"","payload":"true","payloadType":"bool","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":130,"y":380,"wires":[["be610ea2.f82a8"]]},{"id":"e008660f.ab1fd8","type":"data-parser","z":"23406c97.6c35b4","name":"","data":"payload","dataType":"msg","specification":"{\"options\":{\"byteSwap\":true},\"items\":[{\"name\":\"myInt\",\"type\":\"int\",\"offset\":4},{\"name\":\"uint32s\",\"type\":\"uint32\",\"offset\":0,\"length\":4},{\"name\":\"floats\",\"type\":\"float\",\"offset\":0,\"length\":4},{\"name\":\"doubles\",\"type\":\"double\",\"offset\":0,\"length\":2},{\"name\":\"myString\",\"type\":\"string\",\"offset\":0,\"length\":5}]}","specificationType":"json","x":630,"y":120,"wires":[["20b244b5.7b23cc"]]},{"id":"20b244b5.7b23cc","type":"debug","z":"23406c97.6c35b4","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","x":790,"y":120,"wires":[]},{"id":"246db95a.5a8136","type":"comment","z":"23406c97.6c35b4","name":"Pass data in as a Buffer (bytes)","info":"","x":170,"y":80,"wires":[]},{"id":"af5287b5.d15198","type":"inject","z":"23406c97.6c35b4","name":"Pass data in as buffer","topic":"","payload":"[97,98,99,100,101,102,103,104,105,106,107,108,109,109,111,112,113,114,115,116,117,118,119,120,121,122]","payloadType":"bin","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":160,"y":120,"wires":[["e008660f.ab1fd8"]]},{"id":"5373bf6e.7bf09","type":"function","z":"23406c97.6c35b4","name":"abcdefghijklmnopqrstuvwxyz","func":"msg.payload = [0x6162, 0x6364, 0x6566, 0x6768, 0x696A, 0x6B6C, 0x6D6D, 0x6F70, 0x7172, 0x7374, 0x7576, 0x7778, 0x797A]\nreturn msg;","outputs":1,"noerr":0,"x":380,"y":220,"wires":[["e008660f.ab1fd8"]]},{"id":"d0bc0f36.38007","type":"comment","z":"23406c97.6c35b4","name":"Pass data in as array of int (simulate passing values from PLC) ","info":"","x":281,"y":178,"wires":[]},{"id":"6ed04c3e.789c84","type":"comment","z":"23406c97.6c35b4","name":"Byte swap and extract as per the JSON specification","info":"","x":750,"y":80,"wires":[]},{"id":"ccbdafd9.9e6e8","type":"comment","z":"23406c97.6c35b4","name":"Test data and spec entered into node directly","info":"","x":510,"y":280,"wires":[]},{"id":"ce88c305.29fba","type":"comment","z":"23406c97.6c35b4","name":"Inspect the full object for varying output formats","info":"","x":900,"y":280,"wires":[]},{"id":"b9f3ffad.1b41f","type":"inject","z":"23406c97.6c35b4","name":"just a trigger","topic":"","payload":"true","payloadType":"bool","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":130,"y":220,"wires":[["5373bf6e.7bf09"]]}]
+[{"id":"5fcbd3ad.d5e95c","type":"buffer-parser","z":"c70ba4a4.e7fb58","name":"","data":"payload","dataType":"msg","specification":"{\"options\":{\"byteSwap\":[\"swap16\"],\"resultType\":\"value\",\"singleResult\":false,\"msgProperty\":\"payload\"},\"items\":[{\"name\":\"plc1/production/alphabet\",\"type\":\"string\",\"offset\":0,\"length\":26},{\"name\":\"plc1/production/status/count\",\"type\":\"int\",\"offset\":25},{\"name\":\"plc1/production/status/sequence\",\"type\":\"bcd\",\"offset\":4},{\"name\":\"plc1/machine/status/runner/temperature\",\"type\":\"int16le\",\"offset\":26},{\"name\":\"plc1/machine/status/runner/speed\",\"type\":\"int16be\",\"offset\":26},{\"name\":\"plc1/machine/status/running\",\"type\":\"bool\",\"offset\":0,\"offsetbit\":0},{\"name\":\"plc1/machine/status/warning\",\"type\":\"bool\",\"offset\":0,\"offsetbit\":1},{\"name\":\"plc1/machine/status/fault\",\"type\":\"bool\",\"offset\":0,\"offsetbit\":2}]}","specificationType":"json","x":930,"y":280,"wires":[["89fa46b4.411538"]]},{"id":"89fa46b4.411538","type":"debug","z":"c70ba4a4.e7fb58","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","x":1170,"y":280,"wires":[]},{"id":"8d39e2b6.82ff4","type":"buffer-parser","z":"c70ba4a4.e7fb58","name":"","data":"payload","dataType":"msg","specification":"{\"options\":{\"byteSwap\":[\"swap16\"],\"resultType\":\"object\",\"singleResult\":true,\"msgProperty\":\"data\"},\"items\":[{\"name\":\"alphabet\",\"type\":\"string\",\"offset\":0,\"length\":26},{\"name\":\"single byte pos 4\",\"type\":\"int\",\"offset\":4},{\"name\":\"bcd equiv\",\"type\":\"bcd\",\"offset\":4,\"length\":5},{\"name\":\"Array[6] of int16le\",\"type\":\"int16le\",\"offset\":26,\"length\":6},{\"name\":\"Array[6] of int16be\",\"type\":\"int16be\",\"offset\":26,\"length\":6},{\"name\":\"32 bools\",\"type\":\"bool\",\"offset\":0,\"length\":32},{\"name\":\"Array[4] of 16bits\",\"type\":\"16bit\",\"offset\":0,\"length\":4}]}","specificationType":"json","x":930,"y":360,"wires":[["4d7a1094.25f39"]]},{"id":"4d7a1094.25f39","type":"debug","z":"c70ba4a4.e7fb58","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"data","targetType":"msg","x":1160,"y":360,"wires":[]},{"id":"1f38bfbf.d7229","type":"inject","z":"c70ba4a4.e7fb58","name":"Fake PLC data 16bit Array","topic":"","payload":"[25185,25699,26213,26727,27241,27755,28013,28783,29297,29811,30325,30839,31353,256,512,768,1024,1280,1536,1792,2048,2304,2560,2816,3072,3597]","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":710,"y":280,"wires":[["5fcbd3ad.d5e95c"]]},{"id":"73b18844.726b08","type":"inject","z":"c70ba4a4.e7fb58","name":"Fake PLC data 16bit Array","topic":"","payload":"[25185,25699,26213,26727,27241,27755,28013,28783,29297,29811,30325,30839,31353,256,512,768,1024,1280,1536,1792,2048,2304,2560,2816,3072,3597]","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":710,"y":360,"wires":[["8d39e2b6.82ff4"]]},{"id":"6561ba14.6c15a4","type":"comment","z":"c70ba4a4.e7fb58","name":"take a array of 16bit values, byte reverse, split out several values and transmit individual messages with topic + payload","info":"","x":980,"y":240,"wires":[]},{"id":"f607b3c1.b90e1","type":"comment","z":"c70ba4a4.e7fb58","name":"take a array of 16bit values, byte reverse, split out several values and transmit one message with named objects in msg.data","info":"","x":1000,"y":320,"wires":[]}]
 ```
 
 
 
-Dependancies
+Dependencies
 ------------
 
-none
+none :smile:
