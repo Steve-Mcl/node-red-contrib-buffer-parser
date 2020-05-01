@@ -94,10 +94,14 @@ Run the following command in the root directory of your Node-RED install  (usual
 
     npm install node-red-contrib-buffer-parser
 
-Alternatively, install from a folder containing the source
+Or, install direct from github
 
+    npm install steve-mcl/node-red-contrib-buffer-parser
+
+Or clone to a local folder and install using NPM
+
+    git clone https://github.com/Steve-Mcl/node-red-contrib-buffer-parser.git
     npm install c:/source/node-red-contrib-buffer-parser
-
 
 ## Dependencies
 
