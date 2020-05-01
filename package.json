@@ -27,7 +27,7 @@
     },
     "node-red": {
         "nodes": {
-            "data-parser": "buffer-parser.js"
+            "buffer-parser": "buffer-parser.js"
         }
     }
 }
