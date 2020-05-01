@@ -1,0 +1,231 @@
+<!--
+MIT License
+
+Copyright (c) 2020 Steve-Mcl
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+-->
+
+<script type="text/javascript">
+
+(function(){
+
+    function setupTypedInput(varName, types, def) {
+        let varSel = '#node-input-' + varName;
+        let typeSel = varSel + 'Type';
+        let varVal = this[varName];
+        let typeVal = this[varName + 'Type'];
+
+        if (typeVal == null || typeVal === 'none') {
+            typeVal = def;
+        } else if (typeVal === 'string') {
+            typeVal = "str";
+        } else if (typeVal === 'number') {
+            typeVal = "num";
+        }
+        $(typeSel).val(typeVal);
+        $(varSel).typedInput({
+            default: def,
+            typeField: $(typeSel),
+            types: types
+        });
+        $(varSel).typedInput('type', typeVal);
+    }
+    RED.nodes.registerType('buffer-parser', {
+        category: 'function',
+        color: '#0090d4',
+        defaults: {
+            name: { value: "" },
+            data: { value: "payload", validate: RED.validators.typedInput("dataType") },
+            dataType: { value: "msg" },
+            specification: { value: "", validate: RED.validators.typedInput("specificationType") },
+            specificationType: { value: "json" },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-calculator",
+        label: function () {
+            return this.name || "buffer parser";
+        },
+        oneditprepare: function () {
+            var sti = setupTypedInput.bind(this);
+            sti('data', ['msg', 'flow', 'global', 'bin'], 'msg');//data
+            sti('specification', ['msg', 'flow', 'global', 'json'], 'json');//specification
+        }
+    });
+})()
+
+</script>
+
+<script type="text/html" data-template-name="buffer-parser">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-data"><i class="fa fa-table"></i><span data-i18n="buffer-parser.label.data"> data</span></label>
+        <input type="hidden" id="node-input-dataType">
+        <input style="width: 70%" type="text" id="node-input-data" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-parser.label.specification"> specification</span></label>
+        <input type="hidden" id="node-input-specificationType">
+        <input style="width: 70%" type="text" id="node-input-specification" placeholder="">
+    </div>
+</script>
+
+
+<style>
+    span.buffer-parser-prop-name {
+        padding: 0px 3px 2px 3px;
+        margin: 1px;
+        color: #AD1625;
+        white-space: nowrap;
+        background-color: #f7f7f9;
+        border: 1px solid #e1e1e8;
+        border-radius: 2px;
+        font-family: monospace;
+    }
+    span.buffer-parser-prop-type {
+        color: #666;
+        font-style: italic;
+        font-size: smaller;
+        padding-left: 5px;
+    }
+    span.buffer-parser-prop-desc {
+        /* color: #333; */
+        padding-left: 5px;
+    }
+    .buffer-parser-node-help div.buffer-parser-node-help-indent {
+        margin: 0px 0px 0px 6px;
+    }
+</style>
+
+<script type="text/html" data-help-name="buffer-parser">
+<p>A node that converts an array of integer (Int16) or a buffer in to an object of values based on the specification provided</p>
+<h3>Foreword</h3>
+<dl class="message-properties">
+    A number of examples have been included to help you do some common tasks. To use the examples, press the hamburger menu <a id="red-ui-header-button-sidemenu" class="button" href="#"><i class="fa fa-bars"></i></a> select <b>import</b> then <b>examples</b>
+</dl>
+<h3>Inputs</h3>
+<dl class="message-properties">
+    <dt>data <span class="buffer-parser-prop-type">integer[] | buffer</span></dt>
+    <dd> the data to be processed in accordance with the specification. </dd>
+    <dt>specification <span class="buffer-parser-prop-type">string | JSON</span></dt>
+    <dd> the specification to apply to the data</dd>
+</dl>
+<h3>Output</h3>
+<dl class="message-properties">
+    <dt>payload <span class="buffer-parser-prop-type">object | []</span></dt>
+    <dd>the results.</dd>
+    <h4>Additional useful properties are available in the <code>msg</code> object. Use a debug node to inspect them</h4>
+</dl>
+
+<h3>Details</h3>
+    <h4><b>specification...</b></h4>
+    <div class="buffer-parser-node-help-indent">The specification should be an object with the following properties...
+        <ul>
+            <li><span class="buffer-parser-prop-name">options</span> <span class="buffer-parser-prop-type">(Object)</span> <span class="buffer-parser-prop-desc"> processing options</span></li>
+            <li><span class="buffer-parser-prop-name">items</span> <span class="buffer-parser-prop-type">(Array)</span> <span class="buffer-parser-prop-desc"> array of items (see below) </span>
+        </ul>
+        <div>The <span class="buffer-parser-prop-name">options</span> object can have the following properties...
+            <ul>
+                <li><span class="buffer-parser-prop-name">byteSwap</span> <span class="buffer-parser-prop-type">(Boolean|Array|optional)</span> 
+                    <span class="buffer-parser-prop-desc"> swap all bytes before processing items. If <code>true</code>, then <code>swap16</code> will be performed.  If <code>byteSwap</code> is an Array (e.g. <code>["swap64", "swap32", "swap64", "swap16"]</code>) multiple swaps can be performed in the specified order  </span>
+                </li>
+                <li><span class="buffer-parser-prop-name">resultType</span> <span class="buffer-parser-prop-type">(String|optional)</span> <span class="buffer-parser-prop-desc"> How to return data.  Valid options are "object", "array", "value" or "buffer"</span></li>
+                <li><span class="buffer-parser-prop-name">msgProperty</span> <span class="buffer-parser-prop-type">(String|optional)</span> <span class="buffer-parser-prop-desc"> How to return data.  By default, data will be sent in <code>msg.payload</code> - this can be changed as required. e.g. set <span class="buffer-parser-prop-name">msgProperty</span> to <b>newPayload.data</b> to have results sent to <code>msg.newPayload.data</code>  </span></li>
+                <li><span class="buffer-parser-prop-name">singleResult</span> <span class="buffer-parser-prop-type">(Boolean|optional)</span> <span class="buffer-parser-prop-desc"> By default, a single result will be sent at the end of processing. Set <span class="buffer-parser-prop-name">singleResult</span> to <code>false</code> to have individual messages sent per item. NOTE: in this mode, <code>msg.topic</code> will be set to the name provided in the item.</span></li>
+                <li><span class="buffer-parser-prop-name">setTopic</span> <span class="buffer-parser-prop-type">(Boolean|optional)</span> <span class="buffer-parser-prop-desc"> when <span class="buffer-parser-prop-name">singleResult</span> is set to <code>false</code> and the <span class="buffer-parser-prop-name">resultType</span> is set to <b>value</b>, the individual messages topic will be set to the value of item.name (or the items index if not set). To prevent the topic being overwritten, set <span class="buffer-parser-prop-name">setTopic</span> to <code>false</code> </span></li>
+            </ul>
+        </div>
+        <div>The <span class="buffer-parser-prop-name">items</span> array must contain 1 or more objects in the following format (not used when <code>resultType</code>="buffer")...
+            <ul>
+                <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> A name for the resulting data</span></li>
+                <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> The type that ouput data should be changed to (see Allowable types below)</span></li>
+                <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-type">(Number)</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regarless of data source being an buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
+                <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
+                <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The first bit to return when specfiying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="buffer-parser-node-help-indent">Allowable <span class="buffer-parser-prop-name">type</span> options...
+        <ul>
+            <li>int, int8, byte</li>
+            <li>int16, int16le, int16be, uint16, uint16le, uint16be</li>
+            <li>int32, int32le, int32be, uint32, uint32le, uint32be</li>
+            <li>bigint64, bigint64le, bigint64be, biguint64, biguint64le, biguint64be</li>
+            <li>float, floatle, floatbe, double, doublele, doublebe</li>
+            <li>8bit, 16bit 16bitle 16bitbe, bool</li>
+            <li>bcd, bcdle, bcdbe</li>
+            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary</li>
+            <li>NOTES...
+                <ul>
+                    <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>
+                    <li>bcd will convert the numer to a 4BCD equivelant (bcd is not a standard buffer function)</li>
+                    <li>bool will return an array of true or false values. If bit ordering is incorrect, you can swap the data in the options or pass out the values as int16be, int16le, int32be, int32le (etc) value(s) to another node for convertion to booleans</li>
+                    <li>bigint64 operations return a BigInt object, which has some particular behaviours you need to be aware of - see <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt">bigint documentation</a> for further details</li>
+                    <li>Refer to nodejs <a href="https://nodejs.org/api/buffer.html" target="_blank">Buffer documentation</a> for further details</li>
+                </ul>
+            </li>    
+        </ul>
+    </div>    
+    <div class="buffer-parser-node-help-indent">Example specification...
+        <pre><code>
+{
+    "options": {
+        "byteSwap": ["swap32", "swap16"],
+        "returnType": "object",
+        "singleResult": false,
+        "setTopic": true
+    },
+    "items": [
+        {
+            "name": "myInt",
+            "type": "int",
+            "offset": 4
+        },
+        {
+            "name": "myInt16Array_LE",
+            "type": "int16le",
+            "offset": 26,
+            "length": 6
+        },
+        {
+            "name": "myInt16Array_BE",
+            "type": "int16be",
+            "offset": 26,
+            "length": 6
+        },
+        {
+            "name": "booleans",
+            "type": "bool",
+            "offset": 0,
+            "length": 16
+        },
+        {
+            "name": "16bits",
+            "type": "16bit",
+            "offset": 0
+        },
+        {
+            "name": "myString",
+            "type": "string",
+            "offset": 0,
+            "length": 5
+        }
+    ]
+}
+        </pre></code>
+    </div>
+    
+</script>
