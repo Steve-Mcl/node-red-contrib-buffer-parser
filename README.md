@@ -33,6 +33,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
     * "array" : the parsed values are sent as objects in an array, with each object containing a `.value` property and other contextual properties included (like the item specification)
     * "buffer" : this mode simply returns a buffer (no item processing)
 * Built in help
+
   ![help](/images/help.png) 
 
 
@@ -45,9 +46,11 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
 ### Example 1 - array of data to MQTT (multiple topics / payloads)
 
 Screen shot - the flow
+
 ![example1a](/images/example1a.png) 
 
 Screen shot - the output
+
 ![example1b](/images/example1b.png) 
 
 
@@ -60,9 +63,11 @@ Flow...
 ### Example 2 - array of data to an named objects
 
 Screen shot - the flow
+
 ![example2a](/images/example2a.png) 
 
 Screen shot - the output
+
 ![example2b](/images/example2b.png) 
 
 
