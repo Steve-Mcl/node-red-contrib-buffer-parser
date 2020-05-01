@@ -1,9 +1,16 @@
 node-red-contrib-buffer-parser
 ==============================
 
+![node](/images/node.png) 
+
+## About
+
 A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
 
-![node](/images/node.png) 
+
+## A picture is worth a thousand words
+![example1](/images/example1.png) 
+
 
 ## Summary of functionality
 
@@ -35,10 +42,6 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
 * Built in help
 
   ![help](/images/help.png) 
-
-
-## A picture is worth a thousand words
-![example1](/images/example1.png) 
 
 
 ## Examples
