@@ -502,7 +502,7 @@ module.exports = function(RED) {
                                 bitData.push(...bits.bits.map(e => e ? true : false));
                             }
                             if(length == 1){
-                                item.value = bitData[item.offsetbit] ? [true] : [false];
+                                item.value = bitData[item.offsetbit];
                             } else {
                                 item.value = bitData.slice(item.offsetbit, item.offsetbit + length)
                             }
