@@ -205,6 +205,10 @@ module.exports = function(RED) {
             var buf;
             let isArray = Array.isArray(data);
             let isBuffer = Buffer.isBuffer(data);
+            if(typeof data == "string"){
+                data = new Buffer.from(data);
+                isBuffer = true;
+            }
             if(!isArray && !isBuffer){
                 throw new Error(`data is not an array or a buffer`);  
             }
