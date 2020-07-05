@@ -55,15 +55,14 @@ module.exports = function(RED) {
             let isObject = (item != null && typeof item === 'object' && (Array.isArray(item) === false));
             if(!isObject)
                 throw new Error("Spec item is invalid");
-
-            let formattedSpecItem = {
+            let formattedSpecItem = Object.assign({},item, {
                 "name": item.name || "item" + itemNumber,
                 "type": item.type,
                 "offset": item.offset,
                 "offsetbit": item.offsetbit,
                 "length": item.length || 1,
                 "id" : itemNumber - 1
-            }; 
+            });
             
             //ensure name is something
             if(!formattedSpecItem.name){
