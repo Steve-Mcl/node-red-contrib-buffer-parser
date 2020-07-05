@@ -577,7 +577,7 @@ module.exports = function(RED) {
                         break;
                 }
                 if(validatedSpec.options.singleResult === false){
-                    let m = { topic: msg.topic, specification : validatedSpec };
+                    let m = { topic: msg.topic, specification : item };
                     if(validatedSpec.options.setTopic) m.topic = item.name;
                     switch (validatedSpec.options.resultType) {
                         case "array"://not sure about this one!
