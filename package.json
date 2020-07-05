@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-buffer-parser",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A dynamic node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byteswapping and much more",
     "keywords": [
         "node-red",
