@@ -34,7 +34,21 @@ module.exports = function(RED) {
 		node.data = config.data || "";//data
 		node.dataType = config.dataType || "msg";
         node.specification = config.specification || "";//specification
-        node.specificationType = config.specificationType || "str";
+        node.specificationType = config.specificationType || "ui";
+
+        node.items = config.items || [];
+        node.swap1 = config.swap1 || '';
+        node.swap2 = config.swap2 || '';
+        node.swap3 = config.swap3 || '';
+        node.swap1Type = config.swap1Type || 'swap';
+        node.swap2Type = config.swap2Type || 'swap';
+        node.swap3Type = config.swap3Type || 'swap';
+        node.msgProperty = config.msgProperty || 'payload';
+        node.msgPropertyType = config.msgPropertyType || 'msg';
+        node.resultType = config.resultType || 'value';
+        node.resultTypeType = config.resultTypeType || 'str';
+        node.multipleResult = config.multipleResult == true;
+        node.setTopic = config.setTopic != false;
 
 
         function isNumber(n) {
@@ -99,6 +113,9 @@ module.exports = function(RED) {
             formattedSpecItem.offset = formattedSpecItem.offset || 0;
             if(isNumber(formattedSpecItem.offset)){
                 formattedSpecItem.offset = parseInt(formattedSpecItem.offset)
+                if(formattedSpecItem.offset < 0) {
+                    throw new Error("offsetbit must be zero or greater (item '" + (formattedSpecItem.name || "unnamed") + "')");    
+                }
             } else {
                 throw new Error("offset is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
             }
@@ -109,6 +126,9 @@ module.exports = function(RED) {
             }
             if(isNumber(formattedSpecItem.offsetbit)){
                 formattedSpecItem.offsetbit = parseInt(formattedSpecItem.offsetbit);
+                if(formattedSpecItem.offsetbit < 0) {
+                    throw new Error("offsetbit must be zero or greater (item '" + (formattedSpecItem.name || "unnamed") + "')");    
+                }
             } else {
                 throw new Error("offsetbit is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
             }
@@ -137,7 +157,11 @@ module.exports = function(RED) {
             _spec.options.resultType = specification.options.resultType || "value";
             _spec.options.byteSwap = specification.options.byteSwap || false;
             _spec.options.msgProperty = specification.options.msgProperty || "payload";
-            _spec.options.singleResult = specification.options.singleResult === false ? false : true;
+            if(specification.options.multipleResult === true) _spec.options.singleResult = false;
+            if(specification.options.multipleResult === false) _spec.options.singleResult = true;
+            if(specification.options.singleResult === false) _spec.options.singleResult = false;
+            if(specification.options.singleResult === true) _spec.options.singleResult = true;
+            
             _spec.options.setTopic = specification.options.setTopic === false ? false : true;
             
             //validate resultType     
@@ -355,13 +379,31 @@ module.exports = function(RED) {
 
             //helper function to return 1 or more correctly formatted values from the buffer
             function itemReader(item, buffer, bufferFunction, dataSize) {
-                item.value = dataGetter(buffer,item.offset,item.length,bufferFunction,dataSize);
+                item.value = dataGetter(buffer,item.offset,item.length,bufferFunction,dataSize,item.mask);
                 result.objectResults[item.name] = item;
                 result.arrayResults.push(item);
                 result.values.push(item.value);
             }
+            function sanitizeMask(mask, throwError){
+                var _mask = mask
+                try {
+                    if(_mask){
+                        if(typeof _mask == "string" && _mask.trim() != ""){
+                            _mask = parseInt(_mask)
+                        }
+                        if(isNaN(_mask)){
+                            if(throwError) throw new  Error("mask " + mask + " is invalid")
+                        }
+                    }
+                } catch (error) {
+                    if(throwError) throw e
+                }     
+                return _mask;           
+            }
             //helper function to return 1 or more correctly formatted values from the buffer
-            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize) {
+            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask) {
+
+                var _mask = sanitizeMask(mask)
                 let index = 0; 
                 let value;
                 if(dataCount > 1){
@@ -371,6 +413,7 @@ module.exports = function(RED) {
                 for(index = 0; index < dataCount; index++){
                     let bufPos = startByte + (index*dataSize);
                     let val = fn(bufPos);//call specified function on the buffer
+                    if(_mask) val = (val & _mask)
                     if(dataCount > 1){
                         value.push( val );
                     } else {
@@ -493,7 +536,7 @@ module.exports = function(RED) {
                     case "boolean":
                         {
                             let bcount = Math.floor(((item.offsetbit + length) / 8)) + (((item.offsetbit + length) % 8) > 0 ? 1 : 0)
-                            let data = dataGetter(buf, item.offset, bcount, "readUInt8", 1 )
+                            let data = dataGetter(buf, item.offset, bcount, "readUInt8", 1, item.mask)
                             let bitData = []
 
                             if(Array.isArray(data) == false){
@@ -516,7 +559,7 @@ module.exports = function(RED) {
                         break;                        
                     case "8bit":
                         {
-                            let data = dataGetter(buf, item.offset, item.length, "readUInt8", 1 )
+                            let data = dataGetter(buf, item.offset, item.length, "readUInt8", 1, item.mask)
                             let bitData = [];
                             if(Array.isArray(data) === false){
                                 data = [data]
@@ -537,7 +580,7 @@ module.exports = function(RED) {
                     case "16bitbe":
                         {
                             let fn = type == "16bitle" ? "readUInt16LE": "readUInt16BE";
-                            let data = dataGetter(buf, item.offset, item.length, fn, 2 )
+                            let data = dataGetter(buf, item.offset, item.length, fn, 2, item.mask)
                             let bitData = [];
                             if(Array.isArray(data) == false){
                                 data = [data];
@@ -558,7 +601,7 @@ module.exports = function(RED) {
                     case "bcdbe":
                         {
                             let fn = type == "bcdle" ? "readUInt16LE": "readUInt16BE";
-                            let data = dataGetter(buf, item.offset, item.length, fn, 2 )
+                            let data = dataGetter(buf, item.offset, item.length, fn, 2, item.mask)
                             if(item.length > 1){
                                 dataBCD = data.map(bcd2number);
                             } else {
@@ -617,6 +660,94 @@ module.exports = function(RED) {
                     specification = value;
                 }
             }); 
+
+            if(node.specificationType == "ui") {
+                specification = {};
+                var swap1;
+                RED.util.evaluateNodeProperty(node.swap1,node.swap1Type,node,msg,(err,value) => {
+                    if (err) {
+                        node.error("Unable to evaluate swap1",msg);
+                        node.status({fill:"red",shape:"ring",text:"Unable to evaluate swap1"});
+                        return;//halt flow!
+                    } else {
+                        if(node.swap1Type == "env"){
+                            swap1 = value.split(",");
+                            swap1 = swap1.map(e => e.trim());
+                        } else {
+                            swap1 = value;
+                        }
+                    }
+                }); 
+                var swap2;
+                var swap3;
+                if(node.swap1Type == "swap"){
+                    RED.util.evaluateNodeProperty(node.swap2,node.swap2Type,node,msg,(err,value) => {
+                        if (err) {
+                            node.error("Unable to evaluate swap2",msg);
+                            node.status({fill:"red",shape:"ring",text:"Unable to evaluate swap2"});
+                            return;//halt flow!
+                        } else {
+                            swap2 = value;
+                        }
+                    }); 
+                    RED.util.evaluateNodeProperty(node.swap3,node.swap3Type,node,msg,(err,value) => {
+                        if (err) {
+                            node.error("Unable to evaluate swap3",msg);
+                            node.status({fill:"red",shape:"ring",text:"Unable to evaluate swap3"});
+                            return;//halt flow!
+                        } else {
+                            swap3 = value;
+                        }
+                    }); 
+                }
+                
+                var resultType;
+                RED.util.evaluateNodeProperty(node.resultType,node.resultTypeType,node,msg,(err,value) => {
+                    if (err) {
+                        node.error("Unable to evaluate resultType",msg);
+                        node.status({fill:"red",shape:"ring",text:"Unable to evaluate resultType"});
+                        return;//halt flow!
+                    } else {
+                        resultType = value;
+                    }
+                }); 
+                var msgProperty;
+                RED.util.evaluateNodeProperty(node.msgProperty,node.msgPropertyType,node,msg,(err,value) => {
+                    if (err) {
+                        node.error("Unable to evaluate msgProperty",msg);
+                        node.status({fill:"red",shape:"ring",text:"Unable to evaluate msgProperty"});
+                        return;//halt flow!
+                    } else {
+                        msgProperty = value;
+                    }
+                }); 
+
+                var swap = [];
+                if(Array.isArray(swap1)){
+                    swap = swap1;
+                } else {
+                    if(swap1){
+                        swap.push(swap1);
+                        if(swap2){
+                            swap.push(swap2);
+                            if(swap3){
+                                swap.push(swap3);
+                            }
+                        }
+                    }
+                }
+                specification = {
+                    "options": {
+                        "byteSwap": swap,
+                        "resultType": resultType,
+                        "msgProperty": msgProperty,
+                        "multipleResult": node.multipleResult,
+                        "setTopic": node.setTopic
+                    },
+                    "items": node.items
+                }
+                
+            }
 
             let validatedSpec;
             try {
