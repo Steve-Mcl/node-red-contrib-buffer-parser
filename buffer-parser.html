@@ -18,16 +18,16 @@ copies or substantial portions of the Software.
 
 (function(){
     var compatibleDataTypes = {
-                        'int': 'intbe', 
-                        'uint': 'uintbe', 
+                        'int': 'int8', 
+                        'uint': 'uint8', 
+                        'int16': 'int16be', 
+                        'uint16': 'uint16be', 
                         'int32': 'int32be', 
                         'uint32': 'uint32be', 
                         'bigint64': 'bigint64be', 
                         'biguint64': 'biguint64be', 
                         'float': 'floatbe', 
                         'double': 'doublebe',
-                        'int8': 'int' ,
-                        'uint8': 'uint',
                         '16bit': '16bitbe',
                         'boolean': 'bool'
                     }
@@ -111,26 +111,26 @@ copies or substantial portions of the Software.
                             default: "none"
                         }
             var returnOpt = {
-                            value:"return",
-                            label:"return", 
-                            title: "return", 
-                            icon:"fa fa-arrow-left",
+                            value:"output",
+                            label:"output", 
+                            title: "output", 
+                            icon:"fa fa-sign-out",
                             options:[
-                            { label: "value only", value: 'value', title: 'Return a value in the msg property specified by "return to"'},
-                            { label: "object", value: 'object', title: 'Return an object with results in key/value pairs in the msg property specified by "return to"'},
-                            { label: "array", value: 'array', title: 'Return an array of objects in the msg property specified by "return to"'},
-                            { label: "buffer", value: 'buffer', title: 'Return a buffer in the msg property specified by "return to"'},
+                            { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"'},
+                            { label: "object", value: 'object', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"'},
+                            { label: "array", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"'},
+                            { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"'},
                             ],
                             default: "value"
                         }
             var returnOpt2 = {
-                            value:"return",
-                            label:"return", 
-                            title: "return", 
-                            icon:"fa fa-arrow-left",
+                            value:"output",
+                            label:"output", 
+                            title: "output", 
+                            icon:"fa fa-sign-out",
                             options:[
-                            { label: "value only", value: 'value', title: 'Return a value in the msg property specified by "return to"'},
-                            { label: "object", value: 'object', title: 'Return an object in the msg property specified by "return to"'},
+                            { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"'},
+                            { label: "object", value: 'object', title: 'Send an object in the msg property specified by "Output property"'},
                             ],
                             default: "value"
                         }
@@ -139,7 +139,7 @@ copies or substantial portions of the Software.
             var sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap');//specification
             var sw2 = sti('swap2', [swapOpt], 'swap');//specification
             var sw3 = sti('swap3', [swapOpt], 'swap');//specification
-            var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'return');//specification
+            var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'output');//specification
             //var msgPropertyField = sti('msgProperty', ['str', 'msg', 'flow', 'global', 'env'], 'str');//specification
             var msgPropertyField = $("#node-input-msgProperty").typedInput({types:[{label:"msg.", value:"str"}]});
             var multipleResultField = $("#node-input-multipleResult");
@@ -269,37 +269,37 @@ copies or substantial portions of the Software.
                         label:"Type",
                         showLabel: true,
                         options: [
-                            {value: "int",label:"int" },
-                            {value: "uint",label:"uint"},
                             {value: "byte",label:"byte"},
-                            {value: "int16le",label:"int16le" },
-                            {value: "int16be",label:"int16be" },
-                            {value: "uint16le",label:"uint16le" },
-                            {value: "uint16be",label:"uint16be"},
-                            {value: "int32le",label:"int32le" },
-                            {value: "int32be",label:"int32be" },
-                            {value: "uint32le",label:"uint32le" },
-                            {value: "uint32be",label:"uint32be"},
-                            {value: "bigint64le",label:"bigint64le" },
-                            {value: "bigint64be",label:"bigint64be" },
-                            {value: "biguint64le",label:"biguint64le" },
-                            {value: "biguint64be",label:"biguint64be"},
-                            {value: "floatle",label:"floatle" },
-                            {value: "floatbe",label:"floatbe" },
-                            {value: "doublele",label:"doublele" },
-                            {value: "doublebe",label:"doublebe"},
-                            {value: "8bit",label:"8bit" },
-                            {value: "16bitle",label:"16bitle" },
-                            {value: "16bitbe",label:"16bitbe" },
+                            {value: "int8",label:"int8"},
+                            {value: "uint8",label:"uint8"},
+                            {value: "int16le",label:"int16 (le)"},
+                            {value: "int16be",label:"int16 (be)"},
+                            {value: "uint16le",label:"uint16 (le)"},
+                            {value: "uint16be",label:"uint16 (be)"},
+                            {value: "int32le",label:"int32 (le)"},
+                            {value: "int32be",label:"int32 (be)"},
+                            {value: "uint32le",label:"uint32 (le)"},
+                            {value: "uint32be",label:"uint32 (be)"},
+                            {value: "bigint64le",label:"bigint64 (le)"},
+                            {value: "bigint64be",label:"bigint64 (be)"},
+                            {value: "biguint64le",label:"biguint64 (le)"},
+                            {value: "biguint64be",label:"biguint64 (be)"},
+                            {value: "floatle",label:"float (le)"},
+                            {value: "floatbe",label:"float (be)"},
+                            {value: "doublele",label:"double (le)"},
+                            {value: "doublebe",label:"double (be)"},
+                            {value: "8bit",label:"8bit"},
+                            {value: "16bitle",label:"16bit (le)"},
+                            {value: "16bitbe",label:"16bit (be)"},
                             {value: "bool",label:"bool"},
-                            {value: "bcdle",label:"bcdle" },
-                            {value: "bcdbe",label:"bcdbe"},
-                            {value: "string",label:"string" },
-                            {value: "ascii",label:"ascii" },
-                            {value: "utf8",label:"utf8" },
-                            {value: "utf16le",label:"utf16le" },
-                            {value: "ucs2",label:"ucs2" },
-                            {value: "latin1",label:"latin1" },
+                            {value: "bcdle",label:"bcd (le)"},
+                            {value: "bcdbe",label:"bcd (be)"},
+                            {value: "string",label:"string"},
+                            {value: "ascii",label:"ascii"},
+                            {value: "utf8",label:"utf8"},
+                            {value: "utf16le",label:"utf16 (le)"},
+                            {value: "ucs2",label:"ucs2"},
+                            {value: "latin1",label:"latin1"},
                             {value: "binary",label:"binary"},
                         ]
                     }                    
@@ -415,22 +415,22 @@ copies or substantial portions of the Software.
 </script>
 
 <script type="text/html" data-template-name="buffer-parser">
-    <div class="form-row">
+    <div class="form-row buffer-parser-form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-row">
-        <label for="node-input-data"><i class="fa fa-table"></i><span data-i18n="buffer-parser.label.data"> data</span></label>
+    <div class="form-row buffer-parser-form-row">
+        <label for="node-input-data"><i class="fa fa-ellipsis-h"></i><span data-i18n="buffer-parser.label.data"> Property</span></label>
         <input type="hidden" id="node-input-dataType">
         <input style="width: 70%" type="text" id="node-input-data" placeholder="">
     </div>
-    <div class="form-row">
-        <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-parser.label.specification"> specification</span></label>
+    <div class="form-row buffer-parser-form-row">
+        <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-parser.label.specification"> Specification</span></label>
         <input type="hidden" id="node-input-specificationType">
         <input style="width: 70%" type="text" id="node-input-specification" placeholder="">
     </div>    
-    <div class="form-row ui-row" id="ui-row1">
-        <label for="node-input-swap1"><i class="fa fa-exchange"></i><span data-i18n="buffer-parser.label.swap"> swap</span></label>
+    <div class="form-row buffer-parser-form-row ui-row" id="ui-row1">
+        <label for="node-input-swap1"><i class="fa fa-exchange"></i><span data-i18n="buffer-parser.label.swap"> Byte swap</span></label>
         <span>
             <input type="hidden" id="node-input-swap1Type">
             <input style="width: 23%" type="text" id="node-input-swap1" placeholder=""> 
@@ -440,13 +440,13 @@ copies or substantial portions of the Software.
             <input style="width: 23%" type="text" id="node-input-swap3" placeholder=""> 
         </span>
     </div>
-    <div class="form-row ui-row" id="ui-row2">
-        <label for="node-input-msgProperty"><i class="fa fa-arrow-left"></i><span data-i18n="buffer-parser.label.msgProperty"> return to</span></label>
+    <div class="form-row buffer-parser-form-row ui-row" id="ui-row2">
+        <label for="node-input-msgProperty"><i class="fa fa-sign-out"></i><span data-i18n="buffer-parser.label.msgProperty"> Output property</span></label>
         <input type="hidden" id="node-input-msgPropertyType">
         <input style="width: 70%" type="text" id="node-input-msgProperty" placeholder="payload">
     </div>
-    <div class="form-row ui-row" id="ui-row3">
-        <label><i class="fa fa-arrow-left"></i> <span data-i18n="buffer-parser.label.returnOptions">return opts</span></label>
+    <div class="form-row buffer-parser-form-row ui-row" id="ui-row3">
+        <label><i class="fa fa-sign-out"></i> <span data-i18n="buffer-parser.label.returnOptions"> Output options</span></label>
         <span>
             <label for="node-input-multipleResult" style="width:35%">
                 <input type="checkbox" id="node-input-multipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.multipleResult">multiple results</span>
@@ -456,12 +456,12 @@ copies or substantial portions of the Software.
             </label>
         </span>
     </div>
-    <div class="form-row ui-row" id="ui-row4">
-        <label for="node-input-resultType"><i class="fa fa-arrow-left"></i><span data-i18n="buffer-parser.label.resultType"> return</span></label>
+    <div class="form-row buffer-parser-form-row ui-row" id="ui-row4">
+        <label for="node-input-resultType"><i class="fa fa-sign-out"></i><span data-i18n="buffer-parser.label.resultType"> Output</span></label>
         <input type="hidden" id="node-input-resultTypeType">
         <input style="width: 70%" type="text" id="node-input-resultType" placeholder="value">
     </div>
-    <div class="form-row ui-row node-input-items-container-row"  id="ui-row5">
+    <div class="form-row buffer-parser-form-row ui-row node-input-items-container-row"  id="ui-row5">
         <ol id="node-input-items-container"></ol>
     </div>
 </script>
@@ -472,7 +472,10 @@ copies or substantial portions of the Software.
     ol#node-input-items-container .red-ui-typedInput-container {
         flex:1;
     }
-    .buffer-parser-row-item{
+    .buffer-parser-form-row > label {
+        width: 120px !important;
+    }
+    .buffer-parser-row-item {
         margin: 2px 4px 2px 2px;
     }
     .buffer-parser-row {
@@ -521,32 +524,36 @@ copies or substantial portions of the Software.
     <dt>payload <span class="property-type">object | []</span></dt>
     <dd>the results.</dd>
     <h4>NOTES:<br>
-        Payload can be set to an alternative <code>msg</code> property specified by "return to"<br>
+        Payload can be set to an alternative <code>msg</code> property specified by "Output property"<br>
         Additional useful properties are available in the <code>msg</code> object. Use a debug node to inspect them
     </h4>
 </dl>
 
 <h3>Details</h3>
+    <h4><b>Property...</b></h4>
+    <div class="buffer-parser-node-help-indent">
+        The data to be processed in accordance with the specification. NOTE: The data must be a buffer or an array of 16 bit integers
+    <div>
     <h4><b>Specification...</b></h4>
     <div class="buffer-parser-node-help-indent">
         If Specification is set to "UI" then enter the specification in the fields provided below, otherwise, the specification must be an object provided in the format described below in "Dynamic specification"
     <div>
-    <h4><b>Swap...</b></h4>
+    <h4><b>Byte swap...</b></h4>
     <div class="buffer-parser-node-help-indent">
         Swap permits 16 bit, 32 bit or 64 bit swap options. Swap is applied to the whole data before extracting the items specified. If the 1st swap option is set to msg, flow, global, it must be an array containing any number of "swap16" "swap32" "swap64" strings. If the 2st swap option is set to env, then the environment variable must be set to a comma separated list of swaps e.g. swap32,swap16
     <div>
-    <h4><b>return to...</b></h4>
+    <h4><b>Output property...</b></h4>
     <div class="buffer-parser-node-help-indent">
         This allows you to return the result in a propery other than payload. For example, you can have results returned to <code>msg.output</code> or <code>msg.result.data</code>.
     <div>
-    <h4><b>return opts...</b></h4>
+    <h4><b>Output options...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
-            <li><span class="buffer-parser-prop-name">multiple results</span> <span class="buffer-parser-prop-desc"> When false, a single result is returned in the <code>msg</code> property specified by "return to". When true, 1 result per item is returned in the <code>msg</code> property specified by "return to"</span></li>
+            <li><span class="buffer-parser-prop-name">multiple results</span> <span class="buffer-parser-prop-desc"> When false, a single result is returned in the <code>msg</code> property specified by "Output property". When true, 1 result per item is returned in the <code>msg</code> property specified by "Output property"</span></li>
             <li><span class="buffer-parser-prop-name">set topic</span> <span class="buffer-parser-prop-desc"> When false, <code>msg.topic</code> will be unmodified. When true, <code>msg.topic</code> will be set to the value of <code>name</code>. </span></li>
         </ul>         
     <div>
-    <h4><b>return...</b></h4>
+    <h4><b>Output what...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
             <li><span class="buffer-parser-prop-name">value</span> <span class="buffer-parser-prop-desc"> When value is selected, the payload will be the value only</span> </li>
