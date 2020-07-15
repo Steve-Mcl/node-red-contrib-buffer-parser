@@ -18,7 +18,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
 ## Summary of functionality
 
 * Setup a specification and convert multiple parts of an array or buffer to...
-  * int, int8, byte,
+  * int, int8, byte, uint, uint8,
   * int16, int16le, int16be, uint16, uint16le, uint16be,
   * int32, int32le, int32be, uint32, uint32le, uint32be,
   * bigint64, bigint64be, bigint64le, biguint64, biguint64be, biguint64le,
@@ -26,7 +26,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
   * 8bit, 16bit, 16bitle, 16bitbe, bool,
   * bcd, bcdle, bcdbe,
   * string, ascii, utf8, utf16le, ucs2, latin1, binary 
-* Specification is either configured by the built in UI or can be dynamicaly set by a msg/flow/global property - permitting fully dynamic setup (e.g. via a dashboard)
+* Specification is either configured by the built in UI or can be set by a msg/flow/global property - permitting fully dynamic setup (e.g. via a dashboard)
 * The specification format permits random access (e.g. no need for any skips when accessing only first and last elements)
 * You can specify the same offset many times to convert the same piece of data several times
 * The data can be byte swapped one or more times.  16, 32 or 64 bit swaps are possible. The byte swaps are done prior to any data conversions like LE or BE functions (sometimes it is necessary to do multiple swaps) 
