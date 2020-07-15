@@ -45,7 +45,7 @@ module.exports = function(RED) {
         node.swap2Type = config.swap2Type || 'swap';
         node.swap3Type = config.swap3Type || 'swap';
         node.msgProperty = config.msgProperty || 'payload';
-        node.msgPropertyType = config.msgPropertyType || 'msg';
+        node.msgPropertyType = config.msgPropertyType || 'str';
         node.resultType = config.resultType || 'value';
         node.resultTypeType = config.resultTypeType || 'str';
         node.multipleResult = config.multipleResult == true;
@@ -712,16 +712,16 @@ module.exports = function(RED) {
                         resultType = value;
                     }
                 }); 
-                var msgProperty;
-                RED.util.evaluateNodeProperty(node.msgProperty,node.msgPropertyType,node,msg,(err,value) => {
-                    if (err) {
-                        node.error("Unable to evaluate msgProperty",msg);
-                        node.status({fill:"red",shape:"ring",text:"Unable to evaluate msgProperty"});
-                        return;//halt flow!
-                    } else {
-                        msgProperty = value;
-                    }
-                }); 
+                var msgProperty = node.msgProperty;
+                // RED.util.evaluateNodeProperty(node.msgProperty,"str" node.msgPropertyType,node,msg,(err,value) => {
+                //     if (err) {
+                //         node.error("Unable to evaluate msgProperty",msg);
+                //         node.status({fill:"red",shape:"ring",text:"Unable to evaluate msgProperty"});
+                //         return;//halt flow!
+                //     } else {
+                //         msgProperty = value;
+                //     }
+                // }); 
 
                 var swap = [];
                 if(Array.isArray(swap1)){
