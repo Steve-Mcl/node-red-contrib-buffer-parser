@@ -604,7 +604,7 @@ module.exports = function(RED) {
                             let fn = type == "bcdle" ? "readUInt16LE": "readUInt16BE";
                             let data = dataGetter(buf, item.offset, item.length, fn, 2, item.mask)
                             if(item.length > 1){
-                                dataBCD = data.map(bcd2number);
+                                dataBCD = data.map(e => bcd2number(e));
                             } else {
                                 dataBCD = bcd2number(data)
                             }
