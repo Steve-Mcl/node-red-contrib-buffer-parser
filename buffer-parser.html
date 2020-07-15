@@ -512,39 +512,33 @@ copies or substantial portions of the Software.
 <dl class="message-properties">
     A number of examples have been included to help you do some common tasks. To use the examples, press the hamburger menu <a id="red-ui-header-button-sidemenu" class="button" href="#"><i class="fa fa-bars"></i></a> select <b>import</b> then <b>examples</b>
 </dl>
-<h3>Inputs</h3>
-<dl class="message-properties">
-    <dt>data <span class="property-type">integer[] | buffer</span></dt>
-    <dd> the data to be processed in accordance with the specification. </dd>
-    <dt>specification <span class="property-type">JSON | optional</span></dt>
-    <dd> if provided, msg.specification will be used in place of the UI settings</dd>
-</dl>
+
 <h3>Output</h3>
 <dl class="message-properties">
     <dt>payload <span class="property-type">object | []</span></dt>
     <dd>the results.</dd>
     <h4>NOTES:<br>
         Payload can be set to an alternative <code>msg</code> property specified by "Output property"<br>
-        Additional useful properties are available in the <code>msg</code> object. Use a debug node to inspect them
+        Additional useful properties are available in the <code>msg</code> object. Use a debug node (set to show complete output) to inspect them
     </h4>
 </dl>
 
-<h3>Details</h3>
+<h3>UI specification</h3>
     <h4><b>Property...</b></h4>
     <div class="buffer-parser-node-help-indent">
         The data to be processed in accordance with the specification. NOTE: The data must be a buffer or an array of 16 bit integers
     <div>
     <h4><b>Specification...</b></h4>
     <div class="buffer-parser-node-help-indent">
-        If Specification is set to "UI" then enter the specification in the fields provided below, otherwise, the specification must be an object provided in the format described below in "Dynamic specification"
+        If Specification is set to "UI" then enter the specification in the fields provided below, otherwise, the specification must be an object provided in the format described below in <a href="#buffer-parser-help-dyn-spec">Dynamic specification</a>
     <div>
     <h4><b>Byte swap...</b></h4>
     <div class="buffer-parser-node-help-indent">
-        Swap permits 16 bit, 32 bit or 64 bit swap options. Swap is applied to the whole data before extracting the items specified. If the 1st swap option is set to msg, flow, global, it must be an array containing any number of "swap16" "swap32" "swap64" strings. If the 2st swap option is set to env, then the environment variable must be set to a comma separated list of swaps e.g. swap32,swap16
+        Swap permits 16 bit, 32 bit or 64 bit swap options. Swap is applied to the whole data before extracting the items specified. If the 1st swap option is set to msg, flow, global, it must be an array containing any number of "swap16" "swap32" "swap64" strings. If the 1st swap option is set to env, then the environment variable must be set to a comma separated list of swaps e.g. swap32,swap16
     <div>
     <h4><b>Output property...</b></h4>
     <div class="buffer-parser-node-help-indent">
-        This allows you to return the result in a propery other than payload. For example, you can have results returned to <code>msg.output</code> or <code>msg.result.data</code>.
+        This allows you to return the result in a property other than payload. For example, you can have results returned to <code>msg.output</code> or <code>msg.result.data</code>.
     <div>
     <h4><b>Output options...</b></h4>
     <div class="buffer-parser-node-help-indent">
@@ -553,7 +547,7 @@ copies or substantial portions of the Software.
             <li><span class="buffer-parser-prop-name">set topic</span> <span class="buffer-parser-prop-desc"> When false, <code>msg.topic</code> will be unmodified. When true, <code>msg.topic</code> will be set to the value of <code>name</code>. </span></li>
         </ul>         
     <div>
-    <h4><b>Output what...</b></h4>
+    <h4><b>Output...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
             <li><span class="buffer-parser-prop-name">value</span> <span class="buffer-parser-prop-desc"> When value is selected, the payload will be the value only</span> </li>
@@ -566,15 +560,15 @@ copies or substantial portions of the Software.
     <div class="buffer-parser-node-help-indent">
         <ul>
             <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
-            <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-desc"> The type that ouput data should be changed to (see Allowable types below)</span></li>
+            <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
             <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regarless of data source being an buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
             <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
-            <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-desc"> The first bit to return when specfiying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
+            <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
             <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
         </ul>
     <div>
 
-    <h4><b>Dynamic specification...</b></h4>
+<h3 id="buffer-parser-help-dyn-spec">Dynamic specification</h3>
     <div class="buffer-parser-node-help-indent">The <code>specification</code> can be passed in via msg, flow or global instead of being configured by the UI. The dynamic specification must be an object with the following properties...
         <ul>
             <li><span class="buffer-parser-prop-name">options</span> <span class="buffer-parser-prop-type">(Object)</span> <span class="buffer-parser-prop-desc"> processing options</span></li>
@@ -594,10 +588,10 @@ copies or substantial portions of the Software.
         <div>The <span class="buffer-parser-prop-name">items</span> array must contain 1 or more objects in the following format (not used when <code>resultType</code>="buffer")...
             <ul>
                 <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
-                <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> The type that ouput data should be changed to (see Allowable types below)</span></li>
+                <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
                 <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-type">(Number)</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regarless of data source being an buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
                 <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
-                <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The first bit to return when specfiying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
+                <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
                 <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-type">(Number|String|optional)</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
             </ul>
         </div>
@@ -605,7 +599,7 @@ copies or substantial portions of the Software.
 
     <div class="buffer-parser-node-help-indent">Allowable <span class="buffer-parser-prop-name">type</span> options...
         <ul>
-            <li>int, int8, byte</li>
+            <li>int, int8, byte, uint, uint8</li>
             <li>int16, int16le, int16be, uint16, uint16le, uint16be</li>
             <li>int32, int32le, int32be, uint32, uint32le, uint32be</li>
             <li>bigint64, bigint64le, bigint64be, biguint64, biguint64le, biguint64be</li>
