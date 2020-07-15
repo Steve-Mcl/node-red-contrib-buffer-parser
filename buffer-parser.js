@@ -20,6 +20,7 @@ module.exports = function(RED) {
     const SWAPOPTS = ["swap16", "swap32", "swap64"];
     const TYPEOPTS = [  
         "int", "int8", "byte",
+        "uint", "uint8",
         "int16", "int16le", "int16be", "uint16", "uint16le", "uint16be",
         "int32", "int32le", "int32be", "uint32", "uint32le", "uint32be",
         "bigint64", "bigint64le", "bigint64be", "biguint64", "biguint64le", "biguint64be",
