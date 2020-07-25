@@ -74,9 +74,9 @@ copies or substantial portions of the Software.
             swap3Type: { value: "swap"}, 
             msgProperty: { value: "payload"}, 
             msgPropertyType: { value: "str"}, 
-            resultType: { value: "value"}, 
+            resultType: { value: "keyvalue"}, 
             resultTypeType: { value: "return"}, 
-            multipleResult: { value: true}, 
+            multipleResult: { value: false}, 
             setTopic: { value: true}, 
 
         },
@@ -120,7 +120,7 @@ copies or substantial portions of the Software.
                                 { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property"'},
                                 { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"'},
                                 { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"'},
-                            { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"'},
+                                { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"'},
                             ],
                             default: "value"
                         }
@@ -226,7 +226,7 @@ copies or substantial portions of the Software.
                             } 
                         } 
                     }
-                    resultTypeField.typedInput("value", importSpec.options.resultType || "value");
+                    resultTypeField.typedInput("value", importSpec.options.resultType || "keyvalue");
                     msgPropertyField.typedInput("value", importSpec.options.msgProperty || "payload");
 
                     var mr = importSpec.options.singleResult === false;
@@ -551,10 +551,11 @@ copies or substantial portions of the Software.
     <h4><b>Output...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
-            <li><span class="buffer-parser-prop-name">value</span> <span class="buffer-parser-prop-desc"> When value is selected, the payload will be the value only</span> </li>
-            <li><span class="buffer-parser-prop-name">object</span> <span class="buffer-parser-prop-desc">  When object is selected, the payload will be an object</span> </li>
-            <li><span class="buffer-parser-prop-name">value</span> <span class="buffer-parser-prop-desc">  When value is selected, the payload will be  an array</span> </li>
-            <li><span class="buffer-parser-prop-name">buffer</span> <span class="buffer-parser-prop-desc">  When value is selected, the payload will be a buffer. No items will be processed (but byteswaps will be applied).</span> </li>
+            <li><span class="buffer-parser-prop-name">key/value</span> <span class="buffer-parser-prop-desc"> When key/value is selected, the payload will be the value only</span> </li>
+            <li><span class="buffer-parser-prop-name">key/object</span> <span class="buffer-parser-prop-desc">  When key/object is selected, the payload will be an object</span> </li>
+            <li><span class="buffer-parser-prop-name">value only</span> <span class="buffer-parser-prop-desc">  When value only is selected, the payload will be an array of values</span> </li>
+            <li><span class="buffer-parser-prop-name">array</span> <span class="buffer-parser-prop-desc">  When array is selected, the payload will be an array of objects</span> </li>
+            <li><span class="buffer-parser-prop-name">buffer</span> <span class="buffer-parser-prop-desc">  When value is selected, the payload will be a buffer. NOTE: No items will be processed (but byteswaps will be applied).</span> </li>
         </ul>
     <div>
     <h4><b>items...</b></h4>
@@ -580,7 +581,7 @@ copies or substantial portions of the Software.
                 <li><span class="buffer-parser-prop-name">byteSwap</span> <span class="buffer-parser-prop-type">(Boolean|Array|optional)</span> 
                     <span class="buffer-parser-prop-desc"> swap all bytes before processing items. If <code>true</code>, then <code>swap16</code> will be performed.  If <code>byteSwap</code> is an Array (e.g. <code>["swap64", "swap32", "swap64", "swap16"]</code>) multiple swaps can be performed in the specified order  </span>
                 </li>
-                <li><span class="buffer-parser-prop-name">resultType</span> <span class="buffer-parser-prop-type">(String|optional)</span> <span class="buffer-parser-prop-desc"> How to return data.  Valid options are "object", "array", "value" or "buffer"</span></li>
+                <li><span class="buffer-parser-prop-name">resultType</span> <span class="buffer-parser-prop-type">(String|optional)</span> <span class="buffer-parser-prop-desc"> How to return data.  Valid options are "object", "keyvalue", "array", "value" or "buffer"</span></li>
                 <li><span class="buffer-parser-prop-name">msgProperty</span> <span class="buffer-parser-prop-type">(String|optional)</span> <span class="buffer-parser-prop-desc"> How to return data.  By default, data will be sent in <code>msg.payload</code> - this can be changed as required. e.g. set <span class="buffer-parser-prop-name">msgProperty</span> to <b>newPayload.data</b> to have results sent to <code>msg.newPayload.data</code>  </span></li>
                 <li><span class="buffer-parser-prop-name">multipleResult</span> <span class="buffer-parser-prop-type">(Boolean|optional)</span> <span class="buffer-parser-prop-desc"> By default, a single result will be sent at the end of processing. Set <span class="buffer-parser-prop-name">multipleResult</span> to <code>true</code> to have individual messages sent per item.</span></li>
                 <li><span class="buffer-parser-prop-name">setTopic</span> <span class="buffer-parser-prop-type">(Boolean|optional)</span> <span class="buffer-parser-prop-desc"> when <span class="buffer-parser-prop-name">multipleResult</span> is set to <code>true</code>, the individual messages topic will be set to the value of item.name (or the items index if not set). To prevent the topic being overwritten, set <span class="buffer-parser-prop-name">setTopic</span> to <code>false</code> </span></li>

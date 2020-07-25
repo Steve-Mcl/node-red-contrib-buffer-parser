@@ -39,6 +39,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
   * ideal for converting multiple different data elements into one object to pass on to perhaps a template node for preparing a SQL or HTML statement using {{mustache}} formatting
   * additionally, output results can be 1 of 4 styles...
     * "value" : the parsed values are sent in an array 
+    * "keyvalue" : the parsed values are sent in an object as key/value pairs 
     * "object" : the parsed values are sent as named objects with the value set `.value` and other contextual properties included (like the item specification)
     * "array" : the parsed values are sent as objects in an array, with each object containing a `.value` property and other contextual properties included (like the item specification)
     * "buffer" : this mode simply returns a buffer (no item processing)
