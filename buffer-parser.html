@@ -116,9 +116,10 @@ copies or substantial portions of the Software.
                             title: "output", 
                             icon:"fa fa-sign-out",
                             options:[
-                            { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"'},
-                            { label: "object", value: 'object', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"'},
-                            { label: "array", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"'},
+                                { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"'},
+                                { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property"'},
+                                { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"'},
+                                { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"'},
                             { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"'},
                             ],
                             default: "value"

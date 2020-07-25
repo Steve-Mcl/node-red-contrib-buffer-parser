@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 */
 
 module.exports = function(RED) {
-    const RESULTYPEOPTS = ["object", "value", "array", "buffer"];
+    const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
     const SWAPOPTS = ["swap16", "swap32", "swap64"];
     const TYPEOPTS = [  
         "int", "int8", "byte",
@@ -221,6 +221,7 @@ module.exports = function(RED) {
             
             let result = {
                 objectResults : {},
+                keyvalues : {},
                 arrayResults : [],
                 values : [],
                 specification: validatedSpec
@@ -382,6 +383,7 @@ module.exports = function(RED) {
             function itemReader(item, buffer, bufferFunction, dataSize) {
                 item.value = dataGetter(buffer,item.offset,item.length,bufferFunction,dataSize,item.mask);
                 result.objectResults[item.name] = item;
+                result.keyvalues[item.name] = item.value;
                 result.arrayResults.push(item);
                 result.values.push(item.value);
             }
@@ -530,6 +532,7 @@ module.exports = function(RED) {
                     case "binary":
                         item.value = buf.toString(type, offset, offset+length);
                         result.objectResults[item.name] = item;
+                        result.keyvalues[item.name] = item.value;
                         result.arrayResults.push(item);
                         result.values.push(item.value);
                         break;
@@ -554,6 +557,7 @@ module.exports = function(RED) {
                                 item.value = bitData.slice(item.offsetbit, item.offsetbit + length)
                             }
                             result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -572,6 +576,7 @@ module.exports = function(RED) {
                             }
                             item.value = bitData;
                             result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -593,6 +598,7 @@ module.exports = function(RED) {
                             }
                             item.value = bitData;
                             result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -610,6 +616,7 @@ module.exports = function(RED) {
                             }
                             item.value = dataBCD;
                             result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -624,8 +631,8 @@ module.exports = function(RED) {
                     let m = { topic: msg.topic, specification : item };
                     if(validatedSpec.options.setTopic) m.topic = item.name;
                     switch (validatedSpec.options.resultType) {
-                        case "array"://not sure about this one!
                         case "value":
+                        case "keyvalue":
                             setObjectProperty(m, validatedSpec.options.msgProperty, item.value)
                             break;
                         case "object":
@@ -767,6 +774,7 @@ module.exports = function(RED) {
                     msg.specification = results.specification;
                     msg.values = results.values;
                     msg.objectResults = results.objectResults;
+                    msg.keyvalues = results.keyvalues;
                     msg.arrayResults = results.arrayResults;
                     msg.buffer = results.buffer;
 
@@ -779,6 +787,10 @@ module.exports = function(RED) {
                             break;
                         case "object":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults)
+                            break;
+                        case "keyvalue":
+                        case "keyvalues":
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues)
                             break;
                         case "array":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults)
