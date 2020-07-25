@@ -87,7 +87,7 @@ copies or substantial portions of the Software.
             return this.name || "buffer parser";
         },
         oneditprepare: function () {
-            console.log("buffer-parser->oneditprepare()")
+            //console.log("buffer-parser->oneditprepare()")
             var node = this;
             
             var sti = setupTypedInput.bind(this);
@@ -160,14 +160,14 @@ copies or substantial portions of the Software.
                 var t = specificationField.typedInput("type");
                 if(t == "ui"){
                     if(v != "buffer"){
-                        console.log("showing items", v, t)
+                        //console.log("showing items", v, t)
                         $("#ui-row5").show();
                     } else {
-                        console.log("hiding items", v, t)
+                        //console.log("hiding items", v, t)
                         $("#ui-row5").hide(); 
                     }
                 } else {
-                    console.log("hiding items", v, t)
+                    //console.log("hiding items", v, t)
                     $("#ui-row5").hide();
                 }
             });
