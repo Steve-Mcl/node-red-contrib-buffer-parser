@@ -17,6 +17,7 @@ copies or substantial portions of the Software.
 <script type="text/javascript">
 
 (function(){
+    //console.log("node-red-contrib-buffer-parser"); //uncomment me to help locate SRC in devtools!
     var compatibleDataTypes = {
                         'int': 'int8', 
                         'uint': 'uint8', 
@@ -55,6 +56,31 @@ copies or substantial portions of the Software.
         });
         return $(varSel).typedInput('type', typeVal);
     }
+    
+    function getEditItem(index) {
+        try {
+            var items = $("#node-input-items-container").editableList('items');
+            var r = parseEditItem(items[index]);     
+            return parseEditItem(items[index]);
+        } catch (error) { }
+        return null;
+    }
+
+    function parseEditItem($row) {
+        try {
+            var rule = $($row);
+            var r = {};
+            r.type = rule.find(".node-input-item-property-type").val() || "int16be";
+            r.name = rule.find(".node-input-item-property-name").val() || "item" + (i+1);
+            r.offset = parseInt(rule.find(".node-input-item-property-offset").val() || 0);
+            r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
+            r.offsetbit = parseInt(rule.find(".node-input-item-property-offsetbit").val() || 0);             
+            r.mask = rule.find(".node-input-item-property-mask").val() || '';             
+            return r;
+        } catch (error) { }
+        return null;
+    }
+
     RED.nodes.registerType('buffer-parser', {
         category: 'parser',
         color: '#0090d4',
@@ -247,15 +273,39 @@ copies or substantial portions of the Software.
                 }               
             }
 
-
             multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
             resultTypeField.change();//cause the items list to show/hide depending on selection
-
             $('#node-input-items-container').css('min-height','150px').css('min-width','480px').editableList({
                 addItem: function(container,i,opt) {
                     var rule = opt;
                     if (!rule.hasOwnProperty('type')) {
-                        rule = {type:"int16be",name:"item"+(i+1),offset:0,length:1, offsetbit:0, mask:''};
+                        //its a newly added item!
+                        rule = {type:"int16be",name:"item"+(i+1),offset:0,length:1, offsetbit:0, mask:''};//default
+                        var prev = i > 0 ? getEditItem(i-1) : null;
+                        if(prev && prev.type != null){                           
+                            var byteOffsetMultiplier = 0;
+                            var bitOffset = 0;
+                            rule.type = prev.type;
+                            if(rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
+                            if(rule.type == "byte") byteOffsetMultiplier = 1;
+                            if(rule.type == "string") byteOffsetMultiplier = 1;
+                            if(rule.type == "char") byteOffsetMultiplier = 1;
+                            if(rule.type == "ascii") byteOffsetMultiplier = 1;
+                            if(rule.type == "ucs2") byteOffsetMultiplier = 1;
+                            if(rule.type == "latin1") byteOffsetMultiplier = 1;
+                            if(rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
+                            if(rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
+                            if(rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
+                            if(rule.type.indexOf("double") >= 0) byteOffsetMultiplier = 4;
+                            if(rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
+                            if(rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
+                            if(rule.type == "bool") bitOffset = prev.length;
+                            var byteOffset = (prev.length * byteOffsetMultiplier);
+                            if(prev.offset != null) rule.offset = prev.offset+byteOffset;
+                            if(prev.offsetbit != null) rule.offsetbit = prev.offsetbit+bitOffset;
+                            if(prev.length != null) rule.length = prev.length;
+                            if(prev.mask != null) rule.mask = prev.mask;
+                        }
                     }
                   
                     container.css({
@@ -388,13 +438,7 @@ copies or substantial portions of the Software.
             node.items= [];
             items.each(function(i) {
                 var rule = $(this);
-                var r = {};
-                r.type = rule.find(".node-input-item-property-type").val() || "int";
-                r.name = rule.find(".node-input-item-property-name").val() || "item" + (i+1);
-                r.offset = rule.find(".node-input-item-property-offset").val() || 0;
-                r.length = rule.find(".node-input-item-property-length").val() || 1;
-                r.offsetbit = rule.find(".node-input-item-property-offsetbit").val() || 0;             
-                r.mask = rule.find(".node-input-item-property-mask").val() || '';             
+                var r = parseEditItem(rule);         
                 node.items.push(r);
             });
         },
