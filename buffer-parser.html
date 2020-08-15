@@ -104,7 +104,6 @@ copies or substantial portions of the Software.
             resultTypeType: { value: "return"}, 
             multipleResult: { value: false}, 
             setTopic: { value: true}, 
-
         },
         inputs: 1,
         outputs: 1,
@@ -665,13 +664,14 @@ copies or substantial portions of the Software.
         </ul>
     </div>    
     <div class="buffer-parser-node-help-indent">Example specification...
-        <pre><code>
+        <pre><code style="font-size: smaller">
 {
     "options": {
         "byteSwap": ["swap32", "swap16"],
-        "returnType": "object",
+        "resultType": "object",
         "multipleResult": true,
-        "setTopic": true
+        "setTopic": true,
+        "msgProperty": "payload"
     },
     "items": [
         {
