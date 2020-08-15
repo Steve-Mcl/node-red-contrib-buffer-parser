@@ -286,6 +286,7 @@ copies or substantial portions of the Software.
                             var bitOffset = 0;
                             rule.type = prev.type;
                             if(rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
+                            if(rule.type == "buffer") byteOffsetMultiplier = 1;
                             if(rule.type == "byte") byteOffsetMultiplier = 1;
                             if(rule.type == "string") byteOffsetMultiplier = 1;
                             if(rule.type == "char") byteOffsetMultiplier = 1;
@@ -351,6 +352,7 @@ copies or substantial portions of the Software.
                             {value: "ucs2",label:"ucs2"},
                             {value: "latin1",label:"latin1"},
                             {value: "binary",label:"binary"},
+                            {value: "buffer",label:"buffer"},
                         ]
                     }                    
                    
@@ -403,6 +405,10 @@ copies or substantial portions of the Software.
                             offsetbitField.typedInput('show');
                         else
                             offsetbitField.typedInput('hide');                            
+                        if(type == "buffer")
+                            maskField.typedInput('hide');                            
+                        else
+                            maskField.typedInput('show');
                     });
                     rule.type = coerceDataType(rule.type);
                     typeField.typedInput('type',"type");
@@ -651,7 +657,7 @@ copies or substantial portions of the Software.
             <li>float, floatle, floatbe, double, doublele, doublebe</li>
             <li>8bit, 16bit 16bitle 16bitbe, bool</li>
             <li>bcd, bcdle, bcdbe</li>
-            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary</li>
+            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary, buffer</li>
             <li>NOTES...
                 <ul>
                     <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>

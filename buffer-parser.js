@@ -27,7 +27,7 @@ module.exports = function(RED) {
         "float", "floatle", "floatbe", "double", "doublele", "doublebe",
         "8bit", "16bit", "16bitle", "16bitbe", "bool",
         "bcd", "bcdle", "bcdbe",
-        "string", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary" 
+        "string", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "buffer" 
     ];
     function bufferParserNode(config) {
         RED.nodes.createNode(this,config);
@@ -227,7 +227,8 @@ module.exports = function(RED) {
                 specification: validatedSpec
             }
 
-            var buf;
+            
+            /** @type Buffer */ var buf;
             let isArray = Array.isArray(data);
             let isBuffer = Buffer.isBuffer(data);
             if(typeof data == "string"){
@@ -621,6 +622,13 @@ module.exports = function(RED) {
                             result.values.push(item.value);
                         }
                         break;        
+                    case "buffer":
+                        item.value = buf.slice(offset,offset+length);
+                        result.objectResults[item.name] = item;
+                        result.keyvalues[item.name] = item.value;
+                        result.arrayResults.push(item);
+                        result.values.push(item.value);
+                        break;
                     default:
                         let errmsg = `type '${item.type}' is not a recognised parse specification`;
                         console.warn(errmsg);
