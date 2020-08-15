@@ -25,7 +25,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
   * float, floatle, floatbe, double, doublele, doublebe,
   * 8bit, 16bit, 16bitle, 16bitbe, bool,
   * bcd, bcdle, bcdbe,
-  * string, ascii, utf8, utf16le, ucs2, latin1, binary 
+  * string, ascii, utf8, utf16le, ucs2, latin1, binary, buffer 
 * Specification is either configured by the built in UI or can be set by a msg/flow/global property - permitting fully dynamic setup (e.g. via a dashboard)
 * The specification format permits random access (e.g. no need for any skips when accessing only first and last elements)
 * You can specify the same offset many times to convert the same piece of data several times
