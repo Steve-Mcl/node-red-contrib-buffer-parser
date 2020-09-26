@@ -75,6 +75,7 @@ copies or substantial portions of the Software.
             r.offset = parseInt(rule.find(".node-input-item-property-offset").val() || 0);
             r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
             r.offsetbit = parseInt(rule.find(".node-input-item-property-offsetbit").val() || 0);             
+            r.scale = parseFloat(rule.find(".node-input-item-property-scale").val() || 0);             
             r.mask = rule.find(".node-input-item-property-mask").val() || '';             
             return r;
         } catch (error) { }
@@ -279,7 +280,7 @@ copies or substantial portions of the Software.
                     var rule = opt;
                     if (!rule.hasOwnProperty('type')) {
                         //its a newly added item!
-                        rule = {type:"int16be",name:"item"+(i+1),offset:0,length:1, offsetbit:0, mask:''};//default
+                        rule = {type:"int16be",name:"item"+(i+1),offset:0,length:1, offsetbit:0, scale:1, mask:''};//default
                         var prev = i > 0 ? getEditItem(i-1) : null;
                         if(prev && prev.type != null){                           
                             var byteOffsetMultiplier = 0;
@@ -303,6 +304,7 @@ copies or substantial portions of the Software.
                             var byteOffset = (prev.length * byteOffsetMultiplier);
                             if(prev.offset != null) rule.offset = prev.offset+byteOffset;
                             if(prev.offsetbit != null) rule.offsetbit = prev.offsetbit+bitOffset;
+                            if(prev.scale != null) rule.scale = prev.scale;
                             if(prev.length != null) rule.length = prev.length;
                             if(prev.mask != null) rule.mask = prev.mask;
                         }
@@ -393,20 +395,37 @@ copies or substantial portions of the Software.
                         })
 
                     let row1_6 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let offsetbitField = $('<input/>',{class:"node-input-item-property-offsetbit",type:"number", min:"0", width:"125px"})
+                    let offsetbitField = $('<input/>',{class:"node-input-item-property-offsetbit",type:"number", min:"0", width:"110px"})
                         .appendTo(row1_6)
                         .typedInput({types:[{label:"bit offset", value:"num"}]})
+
+                    let row1_7 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
+                    let scaleField = $('<input/>',{class:"node-input-item-property-scale",type:"number",  min:"0.0", step:"0.1", width:"110px"})
+                        .appendTo(row1_7)
+                        .typedInput({types:[{label:"scale", value:"num"}]})
 
 
                     typeField.on("change", function() {
                         var type = $(this).val();
                         var showbitOffset = ["bool","boolean"].indexOf(type) > -1
+                        var showScale = [
+                            "int8",
+                            "int16","int16be","int16le",
+                            "uint16","uint16be","uint16le",
+                            "int32","int32be","int32le",
+                            "uint32","uint32be","uint32le",
+                            "floatbe","floatle","doublebe","doublele"
+                        ].indexOf(type) > -1
                         if(showbitOffset)
                             offsetbitField.typedInput('show');
                         else
-                            offsetbitField.typedInput('hide');                            
+                            offsetbitField.typedInput('hide');
+                        if(showScale)
+                            scaleField.typedInput('show');
+                        else
+                            scaleField.typedInput('hide');
                         if(type == "buffer")
-                            maskField.typedInput('hide');                            
+                            maskField.typedInput('hide');
                         else
                             maskField.typedInput('show');
                     });
@@ -423,6 +442,8 @@ copies or substantial portions of the Software.
                     maskField.typedInput('value',rule.mask);
                     offsetbitField.typedInput('type',"num");
                     offsetbitField.typedInput('value',rule.offsetbit || 0);
+                    scaleField.typedInput('type',"num");
+                    scaleField.typedInput('value',rule.scale || 1);
                     
                     typeField.change();
                     container[0].appendChild(fragment);
@@ -612,10 +633,11 @@ copies or substantial portions of the Software.
         <ul>
             <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
             <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
-            <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regarless of data source being an buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
+            <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regardless of data source being a buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
             <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
             <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
             <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
+            <li><span class="buffer-parser-prop-name">scale</span> <span class="buffer-parser-prop-desc"> A multiplier to apply to the final value. e.g. entering 0.1 will divide the final value by 10.  Entering 10 will multiply the final value by 10</span></li>
         </ul>
     <div>
 
@@ -640,10 +662,11 @@ copies or substantial portions of the Software.
             <ul>
                 <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
                 <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
-                <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-type">(Number)</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regardless of data source being an buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
+                <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-type">(Number)</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regardless of data source being a buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
                 <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
                 <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
                 <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-type">(Number|String|optional)</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
+                <li><span class="buffer-parser-prop-name">scale</span> <span class="buffer-parser-prop-type">(Number|optional)</span><span class="buffer-parser-prop-desc"> A multiplier to apply to the final value. e.g. entering 0.1 will divide the final value by 10.  Entering 10 will multiply the final value by 10</span></li>
             </ul>
         </div>
     </div>
@@ -662,7 +685,7 @@ copies or substantial portions of the Software.
                 <ul>
                     <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>
                     <li>bcd will convert the number to a 4BCD equivalent (bcd is not a standard buffer function)</li>
-                    <li>bool will return an array of true or false values. If bit ordering is incorrect, you can swap the data in the options or pass out the values as int16be, int16le, int32be, int32le (etc) value(s) to another node for convertion to booleans</li>
+                    <li>bool will return an array of true or false values. If bit ordering is incorrect, you can swap the data in the options or pass out the values as int16be, int16le, int32be, int32le (etc) value(s) to another node for conversion to booleans</li>
                     <li>bigint64 operations return a BigInt object, which has some particular behaviours you need to be aware of - see <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt">bigint documentation</a> for further details</li>
                     <li>Refer to nodejs <a href="https://nodejs.org/api/buffer.html" target="_blank">Buffer documentation</a> for further details</li>
                 </ul>
@@ -681,15 +704,17 @@ copies or substantial portions of the Software.
     },
     "items": [
         {
-            "name": "myInt",
+            "name": "myInt_x_10",
             "type": "int",
-            "offset": 4
+            "offset": 4,
+            "scale": 10
         },
         {
-            "name": "myInt16Array_LE",
+            "name": "myInt16Array_LE_divided_by_100",
             "type": "int16le",
             "offset": 26,
-            "length": 6
+            "length": 6,
+            "scale": 0.01
         },
         {
             "name": "myInt16Array_BE",

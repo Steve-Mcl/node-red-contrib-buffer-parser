@@ -75,6 +75,7 @@ module.exports = function(RED) {
                 "type": item.type,
                 "offset": item.offset,
                 "offsetbit": item.offsetbit,
+                "scale": item.scale,
                 "length": item.length || 1,
                 "id" : itemNumber - 1
             });
@@ -132,6 +133,16 @@ module.exports = function(RED) {
                 }
             } else {
                 throw new Error("offsetbit is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
+            }
+            
+            //ensure scale is something
+            if(formattedSpecItem.scale == null || formattedSpecItem.scale == undefined){
+                formattedSpecItem.scale = 0;
+            }
+            if(isNumber(formattedSpecItem.scale)){
+                formattedSpecItem.scale = parseFloat(formattedSpecItem.scale);
+            } else {
+                throw new Error("scale is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
             }
 
             return formattedSpecItem;
@@ -382,7 +393,7 @@ module.exports = function(RED) {
 
             //helper function to return 1 or more correctly formatted values from the buffer
             function itemReader(item, buffer, bufferFunction, dataSize) {
-                item.value = dataGetter(buffer,item.offset,item.length,bufferFunction,dataSize,item.mask);
+                item.value = dataGetter(buffer,item.offset,item.length,bufferFunction,dataSize,item.mask,item.scale);
                 result.objectResults[item.name] = item;
                 result.keyvalues[item.name] = item.value;
                 result.arrayResults.push(item);
@@ -405,7 +416,7 @@ module.exports = function(RED) {
                 return _mask;           
             }
             //helper function to return 1 or more correctly formatted values from the buffer
-            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask) {
+            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask, scale) {
 
                 var _mask = sanitizeMask(mask)
                 let index = 0; 
@@ -417,7 +428,8 @@ module.exports = function(RED) {
                 for(index = 0; index < dataCount; index++){
                     let bufPos = startByte + (index*dataSize);
                     let val = fn(bufPos);//call specified function on the buffer
-                    if(_mask) val = (val & _mask)
+                    if(_mask) val = (val & _mask) 
+                    if(scale && scale != 1) val = val * scale;
                     if(dataCount > 1){
                         value.push( val );
                     } else {

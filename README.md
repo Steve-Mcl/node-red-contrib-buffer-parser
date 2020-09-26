@@ -33,6 +33,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
 * The output can be sent in any `msg` property.  e.g. you can send results out in `msg.my.nested.property`.  This has the advantage of leaving the original payload in tact.
 * Input data can come from any msg property (not limited to `msg.payload`)
 * Input data can be a 16bit array (common plc data format) simplifying working with PLC type data arrays
+* Input data can be a hex string e.g. `1FE2D7FFBE`
 * Output results can be multiple messages as `topic` and `payload` 
   * ideal for taking PLC data and sending it directly to MQTT
 * Output results can be a single msg style output
@@ -43,6 +44,9 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
     * "object" : the parsed values are sent as named objects with the value set `.value` and other contextual properties included (like the item specification)
     * "array" : the parsed values are sent as objects in an array, with each object containing a `.value` property and other contextual properties included (like the item specification)
     * "buffer" : this mode simply returns a buffer (no item processing)
+* Final values can be masked (e.g. a MASK of `0x7FFF` could be used to remove the MSB)
+* Final values can be have a scale applied (e.g. a scale of `0.01` would turn `9710` into `97.1` or a scale of 10 would turn `50` into `500`) 
+  * NOTE: the scale is applied AFTER the mask
 * Built in help
 
   ![help](/images/help.png) 
