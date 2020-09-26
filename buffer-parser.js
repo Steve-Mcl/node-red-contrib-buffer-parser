@@ -243,7 +243,7 @@ module.exports = function(RED) {
             let isArray = Array.isArray(data);
             let isBuffer = Buffer.isBuffer(data);
             if(typeof data == "string"){
-                data = new Buffer.from(data);
+                data = new Buffer.from(data, "hex");
                 isBuffer = true;
             }
             if(!isArray && !isBuffer){
