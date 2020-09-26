@@ -16,25 +16,25 @@ copies or substantial portions of the Software.
 
 <script type="text/javascript">
 
-(function(){
-    //console.log("node-red-contrib-buffer-parser"); //uncomment me to help locate SRC in devtools!
+(function () {
+    //console.log("Initialising node-red-contrib-buffer-parser"); //uncomment me to help locate SRC in devtools!
     var compatibleDataTypes = {
-                        'int': 'int8', 
-                        'uint': 'uint8', 
-                        'int16': 'int16be', 
-                        'uint16': 'uint16be', 
-                        'int32': 'int32be', 
-                        'uint32': 'uint32be', 
-                        'bigint64': 'bigint64be', 
-                        'biguint64': 'biguint64be', 
-                        'float': 'floatbe', 
-                        'double': 'doublebe',
-                        '16bit': '16bitbe',
-                        'boolean': 'bool'
-                    }
-    function coerceDataType(t){
+        'int': 'int8',
+        'uint': 'uint8',
+        'int16': 'int16be',
+        'uint16': 'uint16be',
+        'int32': 'int32be',
+        'uint32': 'uint32be',
+        'bigint64': 'bigint64be',
+        'biguint64': 'biguint64be',
+        'float': 'floatbe',
+        'double': 'doublebe',
+        '16bit': '16bitbe',
+        'boolean': 'bool'
+    }
+    function coerceDataType(t) {
         return compatibleDataTypes[t] || t;
-    }                    
+    }
     function setupTypedInput(varName, types, def) {
         let varSel = '#node-input-' + varName;
         let typeSel = varSel + 'Type';
@@ -56,11 +56,11 @@ copies or substantial portions of the Software.
         });
         return $(varSel).typedInput('type', typeVal);
     }
-    
+
     function getEditItem(index) {
         try {
             var items = $("#node-input-items-container").editableList('items');
-            var r = parseEditItem(items[index]);     
+            var r = parseEditItem(items[index]);
             return parseEditItem(items[index]);
         } catch (error) { }
         return null;
@@ -71,12 +71,12 @@ copies or substantial portions of the Software.
             var rule = $($row);
             var r = {};
             r.type = rule.find(".node-input-item-property-type").val() || "int16be";
-            r.name = rule.find(".node-input-item-property-name").val() || "item" + (i+1);
+            r.name = rule.find(".node-input-item-property-name").val() || "item" + (i + 1);
             r.offset = parseInt(rule.find(".node-input-item-property-offset").val() || 0);
             r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
-            r.offsetbit = parseInt(rule.find(".node-input-item-property-offsetbit").val() || 0);             
-            r.scale = parseFloat(rule.find(".node-input-item-property-scale").val() || 0);             
-            r.mask = rule.find(".node-input-item-property-mask").val() || '';             
+            r.offsetbit = parseInt(rule.find(".node-input-item-property-offsetbit").val() || 0);
+            r.scale = parseFloat(rule.find(".node-input-item-property-scale").val() || 0);
+            r.mask = rule.find(".node-input-item-property-mask").val() || '';
             return r;
         } catch (error) { }
         return null;
@@ -92,19 +92,19 @@ copies or substantial portions of the Software.
             specification: { value: "" },
             specificationType: { value: "ui" },
 
-            items: {value: [{name:"item1",type:"int16be",offset:0,length:1,mask:""}], required:true},
-            swap1: { value: ""}, 
-            swap2: { value: ""}, 
-            swap3: { value: ""}, 
-            swap1Type: { value: "swap"}, 
-            swap2Type: { value: "swap"}, 
-            swap3Type: { value: "swap"}, 
-            msgProperty: { value: "payload"}, 
-            msgPropertyType: { value: "str"}, 
-            resultType: { value: "keyvalue"}, 
-            resultTypeType: { value: "return"}, 
-            multipleResult: { value: false}, 
-            setTopic: { value: true}, 
+            items: { value: [{ name: "item1", type: "int16be", offset: 0, length: 1, mask: "" }], required: true },
+            swap1: { value: "" },
+            swap2: { value: "" },
+            swap3: { value: "" },
+            swap1Type: { value: "swap" },
+            swap2Type: { value: "swap" },
+            swap3Type: { value: "swap" },
+            msgProperty: { value: "payload" },
+            msgPropertyType: { value: "str" },
+            resultType: { value: "keyvalue" },
+            resultTypeType: { value: "return" },
+            multipleResult: { value: false },
+            setTopic: { value: true },
         },
         inputs: 1,
         outputs: 1,
@@ -115,52 +115,52 @@ copies or substantial portions of the Software.
         oneditprepare: function () {
             //console.log("buffer-parser->oneditprepare()")
             var node = this;
-            
+
             var sti = setupTypedInput.bind(this);
             var specOpt = {
-                            value:"ui",
-                            label: "UI Specification", 
-                            hasValue:false
-                        }
+                value: "ui",
+                label: "UI Specification",
+                hasValue: false
+            }
             var swapOpt = {
-                            value:"swap",
-                            label:"Swap", 
-                            title: "Swap", 
-                            showLabel: true,
-                            // icon:"fa fa-exchange",
-                            options:[
-                            { label: "none", value: '', title: ''},
-                            { label: "16", value: 'swap16', title: 'Interprets data as an array of 16-bit integers and swaps the byte order in-place'},
-                            { label: "32", value: 'swap32', title: 'Interprets data as an array of 32-bit integers and swaps the byte order in-place'},
-                            { label: "64", value: 'swap64', title: 'Interprets data as an array of 64-bit integers and swaps the byte order in-place'},
-                            ],
-                            default: "none"
-                        }
+                value: "swap",
+                label: "Swap",
+                title: "Swap",
+                showLabel: true,
+                // icon:"fa fa-exchange",
+                options: [
+                    { label: "none", value: '', title: '' },
+                    { label: "16", value: 'swap16', title: 'Interprets data as an array of 16-bit integers and swaps the byte order in-place' },
+                    { label: "32", value: 'swap32', title: 'Interprets data as an array of 32-bit integers and swaps the byte order in-place' },
+                    { label: "64", value: 'swap64', title: 'Interprets data as an array of 64-bit integers and swaps the byte order in-place' },
+                ],
+                default: "none"
+            }
             var returnOpt = {
-                            value:"output",
-                            label:"output", 
-                            title: "output", 
-                            icon:"fa fa-sign-out",
-                            options:[
-                                { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"'},
-                                { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property"'},
-                                { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"'},
-                                { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"'},
-                                { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"'},
-                            ],
-                            default: "value"
-                        }
+                value: "output",
+                label: "output",
+                title: "output",
+                icon: "fa fa-sign-out",
+                options: [
+                    { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"' },
+                    { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property"' },
+                    { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"' },
+                    { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"' },
+                    { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"' },
+                ],
+                default: "value"
+            }
             var returnOpt2 = {
-                            value:"output",
-                            label:"output", 
-                            title: "output", 
-                            icon:"fa fa-sign-out",
-                            options:[
-                            { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"'},
-                            { label: "object", value: 'object', title: 'Send an object in the msg property specified by "Output property"'},
-                            ],
-                            default: "value"
-                        }
+                value: "output",
+                label: "output",
+                title: "output",
+                icon: "fa fa-sign-out",
+                options: [
+                    { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"' },
+                    { label: "object", value: 'object', title: 'Send an object in the msg property specified by "Output property"' },
+                ],
+                default: "value"
+            }
             sti('data', ['msg', 'json', 'bin'], 'msg');//data
             var specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui');//specification
             var sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap');//specification
@@ -168,57 +168,57 @@ copies or substantial portions of the Software.
             var sw3 = sti('swap3', [swapOpt], 'swap');//specification
             var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'output');//specification
             //var msgPropertyField = sti('msgProperty', ['str', 'msg', 'flow', 'global', 'env'], 'str');//specification
-            var msgPropertyField = $("#node-input-msgProperty").typedInput({types:[{label:"msg.", value:"str"}]});
+            var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
             var multipleResultField = $("#node-input-multipleResult");
             var setTopicField = $("#node-input-setTopic");
-            specificationField.on("change", function() {
+            specificationField.on("change", function () {
                 var v = $(this).val();
                 var t = specificationField.typedInput("type");
-                if(t == "ui"){
+                if (t == "ui") {
                     $(".ui-row").show();
-                    if(!v) specificationField.typedInput("value", "spec")
+                    if (!v) specificationField.typedInput("value", "spec")
                 } else {
                     $(".ui-row").hide();
-                }                
+                }
             });
-            resultTypeField.on("change", function() {
+            resultTypeField.on("change", function () {
                 var v = resultTypeField.typedInput("value");
                 var t = specificationField.typedInput("type");
-                if(t == "ui"){
-                    if(v != "buffer"){
+                if (t == "ui") {
+                    if (v != "buffer") {
                         //console.log("showing items", v, t)
                         $("#ui-row5").show();
                     } else {
                         //console.log("hiding items", v, t)
-                        $("#ui-row5").hide(); 
+                        $("#ui-row5").hide();
                     }
                 } else {
                     //console.log("hiding items", v, t)
                     $("#ui-row5").hide();
                 }
             });
-            multipleResultField.on("change", function() {
+            multipleResultField.on("change", function () {
                 var v = this.checked;
-                if(v){
-                    $("#node-input-resultType").typedInput("types",[returnOpt2]);
+                if (v) {
+                    $("#node-input-resultType").typedInput("types", [returnOpt2]);
                 } else {
-                    $("#node-input-resultType").typedInput("types",[returnOpt]);
+                    $("#node-input-resultType").typedInput("types", [returnOpt]);
                 }
             });
 
-            sw1.on("change", function() {
+            sw1.on("change", function () {
                 var v = $(this).val();
                 var t = $(this).typedInput("type");
                 if (t != "swap" || !v || v == "none") {
-                    sw1.typedInput("width","70%");
+                    sw1.typedInput("width", "70%");
                     sw2.typedInput('hide');
                 } else {
-                    sw1.typedInput("width","23%");
+                    sw1.typedInput("width", "23%");
                     sw2.typedInput('show');
                 }
                 sw2.change();
             });
-            sw2.on("change", function() {
+            sw2.on("change", function () {
                 var v1 = sw1.val();
                 var v2 = sw2.val();
                 var t = sw1.typedInput("type");
@@ -229,28 +229,28 @@ copies or substantial portions of the Software.
                 }
             });
 
-            $("#node-input-multipleResult").on("change",function(){
+            $("#node-input-multipleResult").on("change", function () {
                 $("#node-input-setTopic").prop("disabled", !this.checked);
             })
 
             //in place upgrade from JSON specification to new UI
-            if(node.specification && node.specificationType == "json"){
+            if (node.specification && node.specificationType == "json") {
                 try {
                     var importSpec = JSON.parse(node.specification);
-                    if(importSpec.options.byteSwap === true){
-                        sw1.typedInput("value","swap16");
-                    } else if(importSpec.options.byteSwap === false) {
-                        sw1.typedInput("value","");
-                    } else if(Array.isArray(importSpec.options.byteSwap)){
-                        if(importSpec.options.byteSwap.length >= 1){
-                            sw1.typedInput("value",importSpec.options.byteSwap[0]); 
-                            if(importSpec.options.byteSwap.length >= 2){
-                                sw2.typedInput("value",importSpec.options.byteSwap[1]); 
-                                if(importSpec.options.byteSwap.length >= 3){
-                                    sw3.typedInput("value",importSpec.options.byteSwap[2]); 
-                                } 
-                            } 
-                        } 
+                    if (importSpec.options.byteSwap === true) {
+                        sw1.typedInput("value", "swap16");
+                    } else if (importSpec.options.byteSwap === false) {
+                        sw1.typedInput("value", "");
+                    } else if (Array.isArray(importSpec.options.byteSwap)) {
+                        if (importSpec.options.byteSwap.length >= 1) {
+                            sw1.typedInput("value", importSpec.options.byteSwap[0]);
+                            if (importSpec.options.byteSwap.length >= 2) {
+                                sw2.typedInput("value", importSpec.options.byteSwap[1]);
+                                if (importSpec.options.byteSwap.length >= 3) {
+                                    sw3.typedInput("value", importSpec.options.byteSwap[2]);
+                                }
+                            }
+                        }
                     }
                     resultTypeField.typedInput("value", importSpec.options.resultType || "keyvalue");
                     msgPropertyField.typedInput("value", importSpec.options.msgProperty || "payload");
@@ -258,193 +258,193 @@ copies or substantial portions of the Software.
                     var mr = importSpec.options.singleResult === false;
                     var st = importSpec.options.setTopic === false ? false : true;
 
-                    multipleResultField.prop("checked",mr);
-                    setTopicField.prop("checked",st);
+                    multipleResultField.prop("checked", mr);
+                    setTopicField.prop("checked", st);
 
                     specificationField.typedInput("type", "ui");
 
-                    if(importSpec.items && Array.isArray(importSpec.items)){
+                    if (importSpec.items && Array.isArray(importSpec.items)) {
                         node.items = importSpec.items;
                     }
                     node.specification = null;
                     node.specificationType = null;
                 } catch (error) {
                     console.warn("import and upgrade of old fixed specification into new UI failed :(", error)
-                }               
+                }
             }
 
             multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
             resultTypeField.change();//cause the items list to show/hide depending on selection
-            $('#node-input-items-container').css('min-height','150px').css('min-width','480px').editableList({
-                addItem: function(container,i,opt) {
+            $('#node-input-items-container').css('min-height', '150px').css('min-width', '480px').editableList({
+                addItem: function (container, i, opt) {
                     var rule = opt;
                     if (!rule.hasOwnProperty('type')) {
                         //its a newly added item!
-                        rule = {type:"int16be",name:"item"+(i+1),offset:0,length:1, offsetbit:0, scale:1, mask:''};//default
-                        var prev = i > 0 ? getEditItem(i-1) : null;
-                        if(prev && prev.type != null){                           
+                        rule = { type: "int16be", name: "item" + (i + 1), offset: 0, length: 1, offsetbit: 0, scale: 1, mask: '' };//default
+                        var prev = i > 0 ? getEditItem(i - 1) : null;
+                        if (prev && prev.type != null) {
                             var byteOffsetMultiplier = 0;
                             var bitOffset = 0;
                             rule.type = prev.type;
-                            if(rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
-                            if(rule.type == "buffer") byteOffsetMultiplier = 1;
-                            if(rule.type == "byte") byteOffsetMultiplier = 1;
-                            if(rule.type == "string") byteOffsetMultiplier = 1;
-                            if(rule.type == "char") byteOffsetMultiplier = 1;
-                            if(rule.type == "ascii") byteOffsetMultiplier = 1;
-                            if(rule.type == "ucs2") byteOffsetMultiplier = 1;
-                            if(rule.type == "latin1") byteOffsetMultiplier = 1;
-                            if(rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
-                            if(rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
-                            if(rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
-                            if(rule.type.indexOf("double") >= 0) byteOffsetMultiplier = 4;
-                            if(rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
-                            if(rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
-                            if(rule.type == "bool") bitOffset = prev.length;
+                            if (rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
+                            if (rule.type == "buffer") byteOffsetMultiplier = 1;
+                            if (rule.type == "byte") byteOffsetMultiplier = 1;
+                            if (rule.type == "string") byteOffsetMultiplier = 1;
+                            if (rule.type == "char") byteOffsetMultiplier = 1;
+                            if (rule.type == "ascii") byteOffsetMultiplier = 1;
+                            if (rule.type == "ucs2") byteOffsetMultiplier = 1;
+                            if (rule.type == "latin1") byteOffsetMultiplier = 1;
+                            if (rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
+                            if (rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
+                            if (rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("double") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
+                            if (rule.type == "bool") bitOffset = prev.length;
                             var byteOffset = (prev.length * byteOffsetMultiplier);
-                            if(prev.offset != null) rule.offset = prev.offset+byteOffset;
-                            if(prev.offsetbit != null) rule.offsetbit = prev.offsetbit+bitOffset;
-                            if(prev.scale != null) rule.scale = prev.scale;
-                            if(prev.length != null) rule.length = prev.length;
-                            if(prev.mask != null) rule.mask = prev.mask;
+                            if (prev.offset != null) rule.offset = prev.offset + byteOffset;
+                            if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit + bitOffset;
+                            if (prev.scale != null) rule.scale = prev.scale;
+                            if (prev.length != null) rule.length = prev.length;
+                            if (prev.mask != null) rule.mask = prev.mask;
                         }
                     }
-                  
+
                     container.css({
                         overflow: 'hidden',
                         whiteSpace: 'nowrap'
                     });
                     let fragment = document.createDocumentFragment();
-                    var row1 = $('<div/>',{style:"display:flex;",class:"buffer-parser-row"}).appendTo(fragment);
-                    
-                    var _types ={
-                        value:"type",
-                        label:"Type",
+                    var row1 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row" }).appendTo(fragment);
+
+                    var _types = {
+                        value: "type",
+                        label: "Type",
                         showLabel: true,
                         options: [
-                            {value: "byte",label:"byte"},
-                            {value: "int8",label:"int8"},
-                            {value: "uint8",label:"uint8"},
-                            {value: "int16le",label:"int16 (le)"},
-                            {value: "int16be",label:"int16 (be)"},
-                            {value: "uint16le",label:"uint16 (le)"},
-                            {value: "uint16be",label:"uint16 (be)"},
-                            {value: "int32le",label:"int32 (le)"},
-                            {value: "int32be",label:"int32 (be)"},
-                            {value: "uint32le",label:"uint32 (le)"},
-                            {value: "uint32be",label:"uint32 (be)"},
-                            {value: "bigint64le",label:"bigint64 (le)"},
-                            {value: "bigint64be",label:"bigint64 (be)"},
-                            {value: "biguint64le",label:"biguint64 (le)"},
-                            {value: "biguint64be",label:"biguint64 (be)"},
-                            {value: "floatle",label:"float (le)"},
-                            {value: "floatbe",label:"float (be)"},
-                            {value: "doublele",label:"double (le)"},
-                            {value: "doublebe",label:"double (be)"},
-                            {value: "8bit",label:"8bit"},
-                            {value: "16bitle",label:"16bit (le)"},
-                            {value: "16bitbe",label:"16bit (be)"},
-                            {value: "bool",label:"bool"},
-                            {value: "bcdle",label:"bcd (le)"},
-                            {value: "bcdbe",label:"bcd (be)"},
-                            {value: "string",label:"string"},
-                            {value: "ascii",label:"ascii"},
-                            {value: "utf8",label:"utf8"},
-                            {value: "utf16le",label:"utf16 (le)"},
-                            {value: "ucs2",label:"ucs2"},
-                            {value: "latin1",label:"latin1"},
-                            {value: "binary",label:"binary"},
-                            {value: "buffer",label:"buffer"},
+                            { value: "byte", label: "byte" },
+                            { value: "int8", label: "int8" },
+                            { value: "uint8", label: "uint8" },
+                            { value: "int16le", label: "int16 (le)" },
+                            { value: "int16be", label: "int16 (be)" },
+                            { value: "uint16le", label: "uint16 (le)" },
+                            { value: "uint16be", label: "uint16 (be)" },
+                            { value: "int32le", label: "int32 (le)" },
+                            { value: "int32be", label: "int32 (be)" },
+                            { value: "uint32le", label: "uint32 (le)" },
+                            { value: "uint32be", label: "uint32 (be)" },
+                            { value: "bigint64le", label: "bigint64 (le)" },
+                            { value: "bigint64be", label: "bigint64 (be)" },
+                            { value: "biguint64le", label: "biguint64 (le)" },
+                            { value: "biguint64be", label: "biguint64 (be)" },
+                            { value: "floatle", label: "float (le)" },
+                            { value: "floatbe", label: "float (be)" },
+                            { value: "doublele", label: "double (le)" },
+                            { value: "doublebe", label: "double (be)" },
+                            { value: "8bit", label: "8bit" },
+                            { value: "16bitle", label: "16bit (le)" },
+                            { value: "16bitbe", label: "16bit (be)" },
+                            { value: "bool", label: "bool" },
+                            { value: "bcdle", label: "bcd (le)" },
+                            { value: "bcdbe", label: "bcd (be)" },
+                            { value: "string", label: "string" },
+                            { value: "ascii", label: "ascii" },
+                            { value: "utf8", label: "utf8" },
+                            { value: "utf16le", label: "utf16 (le)" },
+                            { value: "ucs2", label: "ucs2" },
+                            { value: "latin1", label: "latin1" },
+                            { value: "binary", label: "binary" },
+                            { value: "buffer", label: "buffer" },
                         ]
-                    }                    
-                   
-                    
-                    let row1_1 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let typeField = $('<input/>',{class:"node-input-item-property-type",type:"text", width:"165px"})
-                    .appendTo(row1_1)
-                    .typedInput({types:[_types]})
-                    
-                    let row1_2 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let nameField = $('<input/>',{class:"node-input-item-property-name",type:"text", width:"215px"})
+                    }
+
+
+                    let row1_1 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let typeField = $('<input/>', { class: "node-input-item-property-type", type: "text", width: "165px" })
+                        .appendTo(row1_1)
+                        .typedInput({ types: [_types] })
+
+                    let row1_2 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "215px" })
                         .appendTo(row1_2)
-                        .typedInput({types:[{label:"Name", value:"str"}]})
+                        .typedInput({ types: [{ label: "Name", value: "str" }] })
 
-                    let row1_3 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let lengthField = $('<input/>',{class:"node-input-item-property-length",type:"number", min:"0", width:"110px"})
+                    let row1_3 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "110px" })
                         .appendTo(row1_3)
-                        .typedInput({types:[{label:"Length", value:"num"}]})
-                    
-                    let row1_4 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let offsetField = $('<input/>',{class:"node-input-item-property-offset",type:"number", min:"0", width:"110px"})
-                        .appendTo(row1_4)
-                        .typedInput({types:[{label:"Offset", value:"num"}]})
+                        .typedInput({ types: [{ label: "Length", value: "num" }] })
 
-                    let row1_5 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let maskField = $('<input/>',{class:"node-input-item-property-mask", min:"0", width:"152px"})
+                    let row1_4 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let offsetField = $('<input/>', { class: "node-input-item-property-offset", type: "number", min: "0", width: "110px" })
+                        .appendTo(row1_4)
+                        .typedInput({ types: [{ label: "Offset", value: "num" }] })
+
+                    let row1_5 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let maskField = $('<input/>', { class: "node-input-item-property-mask", min: "0", width: "152px" })
                         .appendTo(row1_5)
                         .typedInput({
-                            types:[
+                            types: [
                                 {
-                                    value:"",
-                                    label: "No mask", 
-                                    hasValue:false
+                                    value: "",
+                                    label: "No mask",
+                                    hasValue: false
                                 },
-                                {label:"Mask", value:"str"}
-                            ], 
-                            default:""
+                                { label: "Mask", value: "str" }
+                            ],
+                            default: ""
                         })
 
-                    let row1_6 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let offsetbitField = $('<input/>',{class:"node-input-item-property-offsetbit",type:"number", min:"0", width:"110px"})
+                    let row1_6 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let offsetbitField = $('<input/>', { class: "node-input-item-property-offsetbit", type: "number", min: "0", width: "110px" })
                         .appendTo(row1_6)
-                        .typedInput({types:[{label:"bit offset", value:"num"}]})
+                        .typedInput({ types: [{ label: "bit offset", value: "num" }] })
 
-                    let row1_7 = $('<div/>', {style:"display:flex;", class:"buffer-parser-row-item"}).appendTo(row1);
-                    let scaleField = $('<input/>',{class:"node-input-item-property-scale",type:"number",  min:"0.0", step:"0.1", width:"110px"})
+                    let row1_7 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let scaleField = $('<input/>', { class: "node-input-item-property-scale", type: "number", min: "0.0", step: "0.1", width: "110px" })
                         .appendTo(row1_7)
-                        .typedInput({types:[{label:"scale", value:"num"}]})
+                        .typedInput({ types: [{ label: "scale", value: "num" }] })
 
 
-                    typeField.on("change", function() {
+                    typeField.on("change", function () {
                         var type = $(this).val();
-                        var showbitOffset = ["bool","boolean"].indexOf(type) > -1
+                        var showbitOffset = ["bool", "boolean"].indexOf(type) > -1
                         var showScale = [
                             "int8",
-                            "int16","int16be","int16le",
-                            "uint16","uint16be","uint16le",
-                            "int32","int32be","int32le",
-                            "uint32","uint32be","uint32le",
-                            "floatbe","floatle","doublebe","doublele"
+                            "int16", "int16be", "int16le",
+                            "uint16", "uint16be", "uint16le",
+                            "int32", "int32be", "int32le",
+                            "uint32", "uint32be", "uint32le",
+                            "floatbe", "floatle", "doublebe", "doublele"
                         ].indexOf(type) > -1
-                        if(showbitOffset)
+                        if (showbitOffset)
                             offsetbitField.typedInput('show');
                         else
                             offsetbitField.typedInput('hide');
-                        if(showScale)
+                        if (showScale)
                             scaleField.typedInput('show');
                         else
                             scaleField.typedInput('hide');
-                        if(type == "buffer")
+                        if (type == "buffer")
                             maskField.typedInput('hide');
                         else
                             maskField.typedInput('show');
                     });
                     rule.type = coerceDataType(rule.type);
-                    typeField.typedInput('type',"type");
-                    typeField.typedInput('value',rule.type || "int16be");
-                    nameField.typedInput('type',"str");
-                    nameField.typedInput('value',rule.name || ("item" + (i+1)));
-                    offsetField.typedInput('type',"num");
-                    offsetField.typedInput('value',rule.offset || 0);
-                    lengthField.typedInput('type',"num");
-                    lengthField.typedInput('value',rule.length || 1);
-                    maskField.typedInput('type',rule.mask ? 'str' : '');
-                    maskField.typedInput('value',rule.mask);
-                    offsetbitField.typedInput('type',"num");
-                    offsetbitField.typedInput('value',rule.offsetbit || 0);
-                    scaleField.typedInput('type',"num");
-                    scaleField.typedInput('value',rule.scale || 1);
-                    
+                    typeField.typedInput('type', "type");
+                    typeField.typedInput('value', rule.type || "int16be");
+                    nameField.typedInput('type', "str");
+                    nameField.typedInput('value', rule.name || ("item" + (i + 1)));
+                    offsetField.typedInput('type', "num");
+                    offsetField.typedInput('value', rule.offset || 0);
+                    lengthField.typedInput('type', "num");
+                    lengthField.typedInput('value', rule.length || 1);
+                    maskField.typedInput('type', rule.mask ? 'str' : '');
+                    maskField.typedInput('value', rule.mask);
+                    offsetbitField.typedInput('type', "num");
+                    offsetbitField.typedInput('value', rule.offsetbit || 0);
+                    scaleField.typedInput('type', "num");
+                    scaleField.typedInput('value', rule.scale || 1);
+
                     typeField.change();
                     container[0].appendChild(fragment);
                 },
@@ -452,32 +452,32 @@ copies or substantial portions of the Software.
                 sortable: true
             });
 
-            for (var i=0; i<this.items.length; i++) {
+            for (var i = 0; i < this.items.length; i++) {
                 var item = this.items[i];
-                $("#node-input-items-container").editableList('addItem',item);
+                $("#node-input-items-container").editableList('addItem', item);
             }
 
         },
-        oneditsave: function() {
+        oneditsave: function () {
             var items = $("#node-input-items-container").editableList('items');
             var node = this;
-            node.items= [];
-            items.each(function(i) {
+            node.items = [];
+            items.each(function (i) {
                 var rule = $(this);
-                var r = parseEditItem(rule);         
+                var r = parseEditItem(rule);
                 node.items.push(r);
             });
         },
-        oneditresize: function(size) {
+        oneditresize: function (size) {
             var rows = $("#dialog-form>div:not(.node-input-items-container-row)");
             var height = size.height;
-            for (var i=0; i<rows.length; i++) {
+            for (var i = 0; i < rows.length; i++) {
                 height -= $(rows[i]).outerHeight(true);
             }
             var editorRow = $("#dialog-form>div.node-input-items-container-row");
-            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
             height += 16;
-            $("#node-input-items-container").editableList('height',height);
+            $("#node-input-items-container").editableList('height', height);
         }
 
     });
@@ -539,19 +539,22 @@ copies or substantial portions of the Software.
 
 
 <style>
-
     ol#node-input-items-container .red-ui-typedInput-container {
-        flex:1;
+        flex: 1;
     }
-    .buffer-parser-form-row > label {
+
+    .buffer-parser-form-row>label {
         width: 120px !important;
     }
+
     .buffer-parser-row-item {
         margin: 2px 4px 2px 2px;
     }
+
     .buffer-parser-row {
         flex-wrap: wrap;
     }
+
     span.buffer-parser-prop-name {
         padding: 0px 3px 2px 3px;
         margin: 1px;
@@ -562,16 +565,19 @@ copies or substantial portions of the Software.
         border-radius: 2px;
         font-family: monospace;
     }
+
     span.buffer-parser-prop-type {
         color: #666;
         font-style: italic;
         font-size: smaller;
         padding-left: 5px;
     }
+
     span.buffer-parser-prop-desc {
         /* color: #333; */
         padding-left: 5px;
     }
+
     .buffer-parser-node-help div.buffer-parser-node-help-indent {
         margin: 0px 0px 0px 6px;
     }
