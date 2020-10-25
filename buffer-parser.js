@@ -27,7 +27,7 @@ module.exports = function (RED) {
         "float", "floatle", "floatbe", "double", "doublele", "doublebe",
         "8bit", "16bit", "16bitle", "16bitbe", "bool",
         "bcd", "bcdle", "bcdbe",
-        "string", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "buffer"
+        "string", "hex", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "buffer"
     ];
     function bufferParserNode(config) {
         RED.nodes.createNode(this, config);
@@ -421,6 +421,9 @@ module.exports = function (RED) {
                 var _mask = sanitizeMask(mask)
                 let index = 0;
                 let value;
+                if (dataCount === -1) {
+                    dataCount = Math.floor((buffer.length - startByte) / dataSize);
+                }
                 if (dataCount > 1) {
                     value = [];
                 }
@@ -538,22 +541,31 @@ module.exports = function (RED) {
                     case 'string':// supported: 'ascii', 'utf8', 'utf16le', 'ucs2', 'latin1', and 'binary'.
                         type = "ascii"
                     case 'ascii':
+                    case 'hex':
                     case 'utf8':
                     case "utf16le":
                     case "ucs2":
                     case "latin1":
-                    case "binary":
-                        item.value = buf.toString(type, offset, offset + length);
-                        result.objectResults[item.name] = item;
-                        result.keyvalues[item.name] = item.value;
-                        result.arrayResults.push(item);
-                        result.values.push(item.value);
+                    case "binary": 
+                        {
+                            let _end =  length === -1 ? undefined : offset + length;
+                            item.value = buf.toString(type, offset, _end);
+                            result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
+                            result.arrayResults.push(item);
+                            result.values.push(item.value);
+                        }
                         break;
                     case "bool":
-                    case "boolean":
+                    case "boolean": 
                         {
-                            let bcount = Math.floor(((item.offsetbit + length) / 8)) + (((item.offsetbit + length) % 8) > 0 ? 1 : 0)
-                            let data = dataGetter(buf, item.offset, bcount, "readUInt8", 1, item.mask)
+                            let _byteCount;
+                            if(length === -1) {
+                                _byteCount = -1
+                            } else {
+                                _byteCount = Math.floor(((item.offsetbit + length) / 8)) + (((item.offsetbit + length) % 8) > 0 ? 1 : 0)
+                            }
+                            let data = dataGetter(buf, item.offset, _byteCount, "readUInt8", 1, item.mask)
                             let bitData = []
 
                             if (Array.isArray(data) == false) {
@@ -564,10 +576,12 @@ module.exports = function (RED) {
                                 let bits = byteToBits(thisByte);
                                 bitData.push(...bits.bits.map(e => e ? true : false));
                             }
-                            if (length == 1) {
+                            if (length === 1) {
                                 item.value = bitData[item.offsetbit];
+                            } else if(length === -1) {
+                                item.value = bitData.slice(item.offsetbit); // -1 - return all to the end.
                             } else {
-                                item.value = bitData.slice(item.offsetbit, item.offsetbit + length)
+                                item.value = bitData.slice(item.offsetbit, item.offsetbit + length);
                             }
                             result.objectResults[item.name] = item;
                             result.keyvalues[item.name] = item.value;
@@ -577,7 +591,7 @@ module.exports = function (RED) {
                         break;
                     case "8bit":
                         {
-                            let data = dataGetter(buf, item.offset, item.length, "readUInt8", 1, item.mask)
+                            let data = dataGetter(buf, item.offset, length, "readUInt8", 1, item.mask)
                             let bitData = [];
                             if (Array.isArray(data) === false) {
                                 data = [data]
@@ -599,7 +613,7 @@ module.exports = function (RED) {
                     case "16bitbe":
                         {
                             let fn = type == "16bitle" ? "readUInt16LE" : "readUInt16BE";
-                            let data = dataGetter(buf, item.offset, item.length, fn, 2, item.mask)
+                            let data = dataGetter(buf, item.offset, length, fn, 2, item.mask)
                             let bitData = [];
                             if (Array.isArray(data) == false) {
                                 data = [data];
@@ -621,7 +635,7 @@ module.exports = function (RED) {
                     case "bcdbe":
                         {
                             let fn = type == "bcdle" ? "readUInt16LE" : "readUInt16BE";
-                            let data = dataGetter(buf, item.offset, item.length, fn, 2, item.mask)
+                            let data = dataGetter(buf, item.offset, length, fn, 2, item.mask)
                             if (item.length > 1) {
                                 dataBCD = data.map(e => bcd2number(e));
                             } else {
@@ -634,18 +648,22 @@ module.exports = function (RED) {
                             result.values.push(item.value);
                         }
                         break;
-                    case "buffer":
-                        item.value = buf.slice(offset, offset + length);
-                        result.objectResults[item.name] = item;
-                        result.keyvalues[item.name] = item.value;
-                        result.arrayResults.push(item);
-                        result.values.push(item.value);
+                    case "buffer": 
+                        {
+                            let _end =  length === -1 ? undefined : offset + length;
+                            item.value = buf.slice(offset, _end);
+                            result.objectResults[item.name] = item;
+                            result.keyvalues[item.name] = item.value;
+                            result.arrayResults.push(item);
+                            result.values.push(item.value);
+                        }
                         break;
-                    default:
+                    default: {
                         let errmsg = `type '${item.type}' is not a recognised parse specification`;
                         console.warn(errmsg);
                         throw new Error(errmsg);
                         break;
+                    }
                 }
                 if (validatedSpec.options.singleResult === false) {
                     let m = { topic: msg.topic, specification: item };

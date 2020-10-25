@@ -8,16 +8,20 @@ node-red-contrib-buffer-parser
 A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
 
 
-## A picture is worth a thousand words - here is 2000
+## A picture is worth a thousand words
+
+### Convert array of integers into individual topic/payload messages - ideal for sending to MQTT
 ![example1](/images/example1.png) 
 
-![example1](/images/ui.png) 
+### Convert a buffer into key/value items - ideal for sending to dashboard or database
+![example3](/images/example3.png) 
+![example3b](/images/example3b.png) 
 
 
 
 ## Summary of functionality
 
-* Setup a specification and convert multiple parts of an array or buffer to...
+* Set-up a specification and convert multiple parts of an array or buffer to...
   * int, int8, byte, uint, uint8,
   * int16, int16le, int16be, uint16, uint16le, uint16be,
   * int32, int32le, int32be, uint32, uint32le, uint32be,

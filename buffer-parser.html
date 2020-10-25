@@ -275,7 +275,7 @@ copies or substantial portions of the Software.
 
             multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
             resultTypeField.change();//cause the items list to show/hide depending on selection
-            $('#node-input-items-container').css('min-height', '150px').css('min-width', '480px').editableList({
+            $('#node-input-items-container').css('min-height', '150px').css('min-width', '420px').editableList({
                 addItem: function (container, i, opt) {
                     var rule = opt;
                     if (!rule.hasOwnProperty('type')) {
@@ -292,6 +292,7 @@ copies or substantial portions of the Software.
                             if (rule.type == "string") byteOffsetMultiplier = 1;
                             if (rule.type == "char") byteOffsetMultiplier = 1;
                             if (rule.type == "ascii") byteOffsetMultiplier = 1;
+                            if (rule.type == "hex") byteOffsetMultiplier = 1;
                             if (rule.type == "ucs2") byteOffsetMultiplier = 1;
                             if (rule.type == "latin1") byteOffsetMultiplier = 1;
                             if (rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
@@ -301,9 +302,14 @@ copies or substantial portions of the Software.
                             if (rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
                             if (rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
                             if (rule.type == "bool") bitOffset = prev.length;
-                            var byteOffset = (prev.length * byteOffsetMultiplier);
-                            if (prev.offset != null) rule.offset = prev.offset + byteOffset;
-                            if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit + bitOffset;
+                            if(prev.length > 0) {
+                                var byteOffset = (prev.length * byteOffsetMultiplier);
+                                if (prev.offset != null) rule.offset = prev.offset + byteOffset;
+                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit + bitOffset;
+                            } else {
+                                if (prev.offset != null) rule.offset = prev.offset;
+                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit;
+                            }
                             if (prev.scale != null) rule.scale = prev.scale;
                             if (prev.length != null) rule.length = prev.length;
                             if (prev.mask != null) rule.mask = prev.mask;
@@ -348,6 +354,7 @@ copies or substantial portions of the Software.
                             { value: "bcdle", label: "bcd (le)" },
                             { value: "bcdbe", label: "bcd (be)" },
                             { value: "string", label: "string" },
+                            { value: "hex", label: "hex" },
                             { value: "ascii", label: "ascii" },
                             { value: "utf8", label: "utf8" },
                             { value: "utf16le", label: "utf16 (le)" },
@@ -365,7 +372,7 @@ copies or substantial portions of the Software.
                         .typedInput({ types: [_types] })
 
                     let row1_2 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "215px" })
+                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "145px" })
                         .appendTo(row1_2)
                         .typedInput({ types: [{ label: "Name", value: "str" }] })
 
@@ -375,7 +382,7 @@ copies or substantial portions of the Software.
                         .typedInput({ types: [{ label: "Length", value: "num" }] })
 
                     let row1_4 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let offsetField = $('<input/>', { class: "node-input-item-property-offset", type: "number", min: "0", width: "110px" })
+                    let offsetField = $('<input/>', { class: "node-input-item-property-offset", type: "number", min: "0", width: "100px" })
                         .appendTo(row1_4)
                         .typedInput({ types: [{ label: "Offset", value: "num" }] })
 
@@ -416,18 +423,27 @@ copies or substantial portions of the Software.
                             "uint32", "uint32be", "uint32le",
                             "floatbe", "floatle", "doublebe", "doublele"
                         ].indexOf(type) > -1
-                        if (showbitOffset)
+                        if (showbitOffset) {
+                            offsetbitField.parent().show();
                             offsetbitField.typedInput('show');
-                        else
+                        } else {
                             offsetbitField.typedInput('hide');
-                        if (showScale)
+                            offsetbitField.parent().hide();
+                        }
+                        if (showScale) {
+                            scaleField.parent().show();
                             scaleField.typedInput('show');
-                        else
+                        } else {
                             scaleField.typedInput('hide');
-                        if (type == "buffer")
+                            scaleField.parent().hide();
+                        }
+                        if (type == "buffer") {
+                            maskField.parent().hide();
                             maskField.typedInput('hide');
-                        else
+                        } else {
                             maskField.typedInput('show');
+                            maskField.parent().show();
+                        }
                     });
                     rule.type = coerceDataType(rule.type);
                     typeField.typedInput('type', "type");
@@ -640,7 +656,7 @@ copies or substantial portions of the Software.
             <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
             <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
             <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regardless of data source being a buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
-            <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
+            <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: setting <code>length</code> to -1 will attempt to read all bytes from offset to the end. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
             <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
             <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
             <li><span class="buffer-parser-prop-name">scale</span> <span class="buffer-parser-prop-desc"> A multiplier to apply to the final value. e.g. entering 0.1 will divide the final value by 10.  Entering 10 will multiply the final value by 10</span></li>
@@ -669,7 +685,7 @@ copies or substantial portions of the Software.
                 <li><span class="buffer-parser-prop-name">name</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> A name to identify the resulting data. This can also be used as the topic when returning multiple values.</span></li>
                 <li><span class="buffer-parser-prop-name">type</span> <span class="buffer-parser-prop-type">(String)</span> <span class="buffer-parser-prop-desc"> The type that output data should be changed to (see Allowable types below)</span></li>
                 <li><span class="buffer-parser-prop-name">offset</span> <span class="buffer-parser-prop-type">(Number)</span> <span class="buffer-parser-prop-desc"> The <span class="buffer-parser-prop-name">offset</span> value denotes which byte to start reading data from. This is regardless of data source being a buffer or an integer array e.g. when data source is an integer array, specifying 3 means item source data will start from the middle of the 2nd WORD</span></li>
-                <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
+                <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: setting <code>length</code> to -1 will attempt to read all bytes from offset to the end. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
                 <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-type">(Number|optional)</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
                 <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-type">(Number|String|optional)</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
                 <li><span class="buffer-parser-prop-name">scale</span> <span class="buffer-parser-prop-type">(Number|optional)</span><span class="buffer-parser-prop-desc"> A multiplier to apply to the final value. e.g. entering 0.1 will divide the final value by 10.  Entering 10 will multiply the final value by 10</span></li>
@@ -686,7 +702,7 @@ copies or substantial portions of the Software.
             <li>float, floatle, floatbe, double, doublele, doublebe</li>
             <li>8bit, 16bit 16bitle 16bitbe, bool</li>
             <li>bcd, bcdle, bcdbe</li>
-            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary, buffer</li>
+            <li>string, hex, ascii, utf8, utf16le, ucs2, latin1, binary, buffer</li>
             <li>NOTES...
                 <ul>
                     <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>
@@ -743,7 +759,7 @@ copies or substantial portions of the Software.
             "name": "myString",
             "type": "string",
             "offset": 0,
-            "length": 5
+            "length": -1
         }
     ]
 }
