@@ -5,7 +5,7 @@ node-red-contrib-buffer-parser
 
 ## About
 
-A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer or integer array into the many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
+A <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer, integer array or hex string into many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
 
 
 ## A picture is worth a thousand words
@@ -29,7 +29,7 @@ A dynamic <a href="http://nodered.org" target="_new">Node-RED</a> node to conver
   * float, floatle, floatbe, double, doublele, doublebe,
   * 8bit, 16bit, 16bitle, 16bitbe, bool,
   * bcd, bcdle, bcdbe,
-  * string, ascii, utf8, utf16le, ucs2, latin1, binary, buffer 
+  * string, hex, ascii, utf8, utf16le, ucs2, latin1, binary, buffer 
 * Specification is either configured by the built in UI or can be set by a msg/flow/global property - permitting fully dynamic setup (e.g. via a dashboard)
 * The specification format permits random access (e.g. no need for any skips when accessing only first and last elements)
 * You can specify the same offset many times to convert the same piece of data several times
