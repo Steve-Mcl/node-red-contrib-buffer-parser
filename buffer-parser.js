@@ -27,7 +27,7 @@ module.exports = function (RED) {
         "float", "floatle", "floatbe", "double", "doublele", "doublebe",
         "8bit", "16bit", "16bitle", "16bitbe", "bool",
         "bcd", "bcdle", "bcdbe",
-        "string", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "buffer"
+        "string", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "hex", "buffer"
     ];
     function bufferParserNode(config) {
         RED.nodes.createNode(this, config);
@@ -535,7 +535,7 @@ module.exports = function (RED) {
                         itemReader(item, buf, "readDoubleBE", 8);
                         break
 
-                    case 'string':// supported: 'ascii', 'utf8', 'utf16le', 'ucs2', 'latin1', and 'binary'.
+                    case 'string':// supported: 'ascii', 'utf8', 'utf16le', 'ucs2', 'latin1', 'binary' and 'hex'.
                         type = "ascii"
                     case 'ascii':
                     case 'utf8':
@@ -543,6 +543,7 @@ module.exports = function (RED) {
                     case "ucs2":
                     case "latin1":
                     case "binary":
+                    case "hex":
                         item.value = buf.toString(type, offset, offset + length);
                         result.objectResults[item.name] = item;
                         result.keyvalues[item.name] = item.value;

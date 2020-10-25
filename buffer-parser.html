@@ -294,6 +294,8 @@ copies or substantial portions of the Software.
                             if (rule.type == "ascii") byteOffsetMultiplier = 1;
                             if (rule.type == "ucs2") byteOffsetMultiplier = 1;
                             if (rule.type == "latin1") byteOffsetMultiplier = 1;
+                            if (rule.type == "binary") byteOffsetMultiplier = 1;
+                            if (rule.type == "hex") byteOffsetMultiplier = 1;
                             if (rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
                             if (rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
                             if (rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
@@ -354,6 +356,7 @@ copies or substantial portions of the Software.
                             { value: "ucs2", label: "ucs2" },
                             { value: "latin1", label: "latin1" },
                             { value: "binary", label: "binary" },
+                            { value: "hex", label: "hex" },
                             { value: "buffer", label: "buffer" },
                         ]
                     }
@@ -686,7 +689,7 @@ copies or substantial portions of the Software.
             <li>float, floatle, floatbe, double, doublele, doublebe</li>
             <li>8bit, 16bit 16bitle 16bitbe, bool</li>
             <li>bcd, bcdle, bcdbe</li>
-            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary, buffer</li>
+            <li>string, ascii, utf8, utf16le, ucs2, latin1, binary, hex, buffer</li>
             <li>NOTES...
                 <ul>
                     <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>
