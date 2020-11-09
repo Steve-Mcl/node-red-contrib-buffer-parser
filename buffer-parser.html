@@ -417,11 +417,9 @@ copies or substantial portions of the Software.
                         var type = $(this).val();
                         var showbitOffset = ["bool", "boolean"].indexOf(type) > -1
                         var showScale = [
-                            "int8",
-                            "int16", "int16be", "int16le",
-                            "uint16", "uint16be", "uint16le",
-                            "int32", "int32be", "int32le",
-                            "uint32", "uint32be", "uint32le",
+                            "int8", "uint8",
+                            "int16", "int16be", "int16le","uint16", "uint16be", "uint16le",
+                            "int32", "int32be", "int32le","uint32", "uint32be", "uint32le",
                             "floatbe", "floatle", "doublebe", "doublele"
                         ].indexOf(type) > -1
                         if (showbitOffset) {
