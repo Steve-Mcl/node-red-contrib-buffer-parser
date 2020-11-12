@@ -211,8 +211,9 @@ module.exports = function (RED) {
          * @param {string} path - the path to the property e.g. payload.value
          * @param {*} val - the value to set in obj.path
          */
-        function setObjectProperty(obj, path, val) {
-            const keys = path.split('.');
+        function setObjectProperty(obj, path, val, sep) {
+            sep = sep == null ? "=>" : sep;
+            const keys = path.split(sep);
             const lastKey = keys.pop();
             const lastObj = keys.reduce((obj, key) =>
                 obj[key] = obj[key] || {},
@@ -394,8 +395,10 @@ module.exports = function (RED) {
             //helper function to return 1 or more correctly formatted values from the buffer
             function itemReader(item, buffer, bufferFunction, dataSize) {
                 item.value = dataGetter(buffer, item.offset, item.length, bufferFunction, dataSize, item.mask, item.scale);
-                result.objectResults[item.name] = item;
-                result.keyvalues[item.name] = item.value;
+                // result.objectResults[item.name] = item;
+                setObjectProperty(result.objectResults, item.name, item);
+                // result.keyvalues[item.name] = item.value;
+                setObjectProperty(result.keyvalues, item.name, item.value);
                 result.arrayResults.push(item);
                 result.values.push(item.value);
             }
@@ -550,8 +553,10 @@ module.exports = function (RED) {
                         {
                             let _end =  length === -1 ? undefined : offset + length;
                             item.value = buf.toString(type, offset, _end);
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -583,8 +588,10 @@ module.exports = function (RED) {
                             } else {
                                 item.value = bitData.slice(item.offsetbit, item.offsetbit + length);
                             }
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -602,8 +609,10 @@ module.exports = function (RED) {
                                 bitData.push(bits);
                             }
                             item.value = bitData;
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -624,8 +633,10 @@ module.exports = function (RED) {
                                 bitData.push(bits);
                             }
                             item.value = bitData;
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -642,8 +653,10 @@ module.exports = function (RED) {
                                 dataBCD = bcd2number(data)
                             }
                             item.value = dataBCD;
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -652,8 +665,10 @@ module.exports = function (RED) {
                         {
                             let _end =  length === -1 ? undefined : offset + length;
                             item.value = buf.slice(offset, _end);
-                            result.objectResults[item.name] = item;
-                            result.keyvalues[item.name] = item.value;
+                            // result.objectResults[item.name] = item;
+                            setObjectProperty(result.objectResults, item.name, item);
+                            // result.keyvalues[item.name] = item.value;
+                            setObjectProperty(result.keyvalues, item.name, item.value);
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }

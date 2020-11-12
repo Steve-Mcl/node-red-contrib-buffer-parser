@@ -142,8 +142,8 @@ copies or substantial portions of the Software.
                 title: "output",
                 icon: "fa fa-sign-out",
                 options: [
-                    { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property"' },
-                    { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property"' },
+                    { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in payload.motor1.power.' },
+                    { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in payload.motor1.power.' },
                     { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"' },
                     { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"' },
                     { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"' },
@@ -642,8 +642,8 @@ copies or substantial portions of the Software.
     <h4><b>Output...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
-            <li><span class="buffer-parser-prop-name">key/value</span> <span class="buffer-parser-prop-desc"> When key/value is selected, the payload will be the value only</span> </li>
-            <li><span class="buffer-parser-prop-name">key/object</span> <span class="buffer-parser-prop-desc">  When key/object is selected, the payload will be an object</span> </li>
+            <li><span class="buffer-parser-prop-name">key/value</span> <span class="buffer-parser-prop-desc"> When key/value is selected, the payload will be the value only</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>payload.motor1.power</code>. </li>
+            <li><span class="buffer-parser-prop-name">key/object</span> <span class="buffer-parser-prop-desc">  When key/object is selected, the payload will be an object</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>payload.motor1.power</code>. </li>
             <li><span class="buffer-parser-prop-name">value only</span> <span class="buffer-parser-prop-desc">  When value only is selected, the payload will be an array of values</span> </li>
             <li><span class="buffer-parser-prop-name">array</span> <span class="buffer-parser-prop-desc">  When array is selected, the payload will be an array of objects</span> </li>
             <li><span class="buffer-parser-prop-name">buffer</span> <span class="buffer-parser-prop-desc">  When value is selected, the payload will be a buffer. NOTE: No items will be processed (but byteswaps will be applied).</span> </li>
@@ -708,6 +708,7 @@ copies or substantial portions of the Software.
                     <li>bcd will convert the number to a 4BCD equivalent (bcd is not a standard buffer function)</li>
                     <li>bool will return an array of true or false values. If bit ordering is incorrect, you can swap the data in the options or pass out the values as int16be, int16le, int32be, int32le (etc) value(s) to another node for conversion to booleans</li>
                     <li>bigint64 operations return a BigInt object, which has some particular behaviours you need to be aware of - see <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt">bigint documentation</a> for further details</li>
+                    <li>for key/value and key/object, fat arrow <code>=></code> will create sub objects. e.g. a name of `motor1=>power` will generate an object `motor1` with a property `power`.</li>
                     <li>Refer to nodejs <a href="https://nodejs.org/api/buffer.html" target="_blank">Buffer documentation</a> for further details</li>
                 </ul>
             </li>    
