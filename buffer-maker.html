@@ -1,0 +1,555 @@
+<!--
+MIT License
+
+Copyright (c) 2020 Steve-Mcl
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+-->
+
+<script type="text/javascript">
+
+(function () {
+    console.log("Initialising node-red-contrib-buffer-parser"); //uncomment me to help locate SRC in devtools!
+    var compatibleDataTypes = {
+        'int': 'int8',
+        'uint': 'uint8',
+        'int16': 'int16be',
+        'uint16': 'uint16be',
+        'int32': 'int32be',
+        'uint32': 'uint32be',
+        'bigint64': 'bigint64be',
+        'biguint64': 'biguint64be',
+        'float': 'floatbe',
+        'double': 'doublebe',
+        '16bit': '16bitbe',
+        'boolean': 'bool'
+    }
+    function coerceDataType(t) {
+        return compatibleDataTypes[t] || t;
+    }
+    function setupTypedInput(varName, types, def) {
+        let varSel = '#node-input-' + varName;
+        let typeSel = varSel + 'Type';
+        let varVal = this[varName];
+        let typeVal = this[varName + 'Type'];
+
+        if (typeVal == null || typeVal === 'none') {
+            typeVal = def;
+        } else if (typeVal === 'string') {
+            typeVal = "str";
+        } else if (typeVal === 'number') {
+            typeVal = "num";
+        }
+        $(typeSel).val(typeVal);
+        $(varSel).typedInput({
+            default: def,
+            typeField: $(typeSel),
+            types: types
+        });
+        return $(varSel).typedInput('type', typeVal);
+    }
+
+    function getEditItem(index) {
+        try {
+            var items = $("#node-input-items-container").editableList('items');
+            var r = parseEditItem(items[index]);
+            return parseEditItem(items[index]);
+        } catch (error) { }
+        return null;
+    }
+
+    function parseEditItem($row) {
+        try {
+            var rule = $($row);
+            var r = {};
+            r.name = rule.find(".node-input-item-property-name").val() || "item" + (i + 1);
+            r.type = rule.find(".node-input-item-property-type").val() || "int16be";
+            r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
+            var d = $(rule.find(".node-input-item-property-data"));
+            r.dataType =  d.typedInput("type");
+            r.data =  d.typedInput("value");
+            return r;
+        } catch (error) { }
+        return null;
+    }
+
+    RED.nodes.registerType('buffer-maker', {
+        category: 'parser',
+        color: '#0090d4',
+        defaults: {
+            name: { value: "" },
+            data: { value: "payload", validate: RED.validators.typedInput("dataType") },
+            dataType: { value: "msg" },
+            specification: { value: "" },
+            specificationType: { value: "ui" },
+
+            items: { value: [{ name: "item1", type: "int16be", data: "payload", dataType: "msg" }], required: true },
+            swap1: { value: "" },
+            swap2: { value: "" },
+            swap3: { value: "" },
+            swap1Type: { value: "swap" },
+            swap2Type: { value: "swap" },
+            swap3Type: { value: "swap" },
+            msgProperty: { value: "payload" },
+            msgPropertyType: { value: "str" },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-calculator",
+        label: function () {
+            return this.name || "buffer maker";
+        },
+        oneditprepare: function () {
+            console.log("buffer-maker->oneditprepare()")
+            var node = this;
+
+            var sti = setupTypedInput.bind(this);
+            var specOpt = {
+                value: "ui",
+                label: "UI Specification",
+                hasValue: false
+            }
+            var swapOpt = {
+                value: "swap",
+                label: "Swap",
+                title: "Swap",
+                showLabel: true,
+                // icon:"fa fa-exchange",
+                options: [
+                    { label: "none", value: '', title: '' },
+                    { label: "16", value: 'swap16', title: 'Interprets data as an array of 16-bit integers and swaps the byte order in-place' },
+                    { label: "32", value: 'swap32', title: 'Interprets data as an array of 32-bit integers and swaps the byte order in-place' },
+                    { label: "64", value: 'swap64', title: 'Interprets data as an array of 64-bit integers and swaps the byte order in-place' },
+                ],
+                default: "none"
+            }
+
+            sti('data', ['msg', 'json', 'bin'], 'msg');//data
+            var specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui');//specification
+            var sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap');//specification
+            var sw2 = sti('swap2', [swapOpt], 'swap');//specification
+            var sw3 = sti('swap3', [swapOpt], 'swap');//specification
+            var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
+            specificationField.on("change", function () {
+                var v = $(this).val();
+                var t = specificationField.typedInput("type");
+                if (t == "ui") {
+                    $(".ui-row").show();
+                    if (!v) specificationField.typedInput("value", "spec")
+                } else {
+                    $(".ui-row").hide();
+                }
+            });
+
+
+            sw1.on("change", function () {
+                var v = $(this).val();
+                var t = $(this).typedInput("type");
+                if (t != "swap" || !v || v == "none") {
+                    sw1.typedInput("width", "70%");
+                    sw2.typedInput('hide');
+                } else {
+                    sw1.typedInput("width", "23%");
+                    sw2.typedInput('show');
+                }
+                sw2.change();
+            });
+            sw2.on("change", function () {
+                var v1 = sw1.val();
+                var v2 = sw2.val();
+                var t = sw1.typedInput("type");
+                if (t != "swap" || !v1 || !v2 || v1 == "none" || v2 == "none") {
+                    sw3.typedInput('hide');
+                } else {
+                    sw3.typedInput('show');
+                }
+            });
+
+            $('#node-input-items-container').css('min-height', '150px').css('min-width', '500px').editableList({
+                addItem: function (container, i, opt) {
+                    var rule = opt;
+                    if (!rule.hasOwnProperty('type')) {
+                        //its a newly added item!
+                        rule = { type: "int16be", name: "item" + (i + 1), length: 1, dataType: "msg", data: "payload" };//default
+                        var prev = i > 0 ? getEditItem(i - 1) : null;
+                        if (prev && prev.type != null) {
+                            var byteOffsetMultiplier = 0;
+                            var bitOffset = 0;
+                            rule.type = prev.type;
+                            if (rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
+                            if (rule.type == "buffer") byteOffsetMultiplier = 1;
+                            if (rule.type == "byte") byteOffsetMultiplier = 1;
+                            if (rule.type == "string") byteOffsetMultiplier = 1;
+                            if (rule.type == "char") byteOffsetMultiplier = 1;
+                            if (rule.type == "ascii") byteOffsetMultiplier = 1;
+                            if (rule.type == "hex") byteOffsetMultiplier = 1;
+                            if (rule.type == "binary") byteOffsetMultiplier = 1;
+                            if (rule.type == "ucs2") byteOffsetMultiplier = 1;
+                            if (rule.type == "latin1") byteOffsetMultiplier = 1;
+                            if (rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
+                            if (rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
+                            if (rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("double") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
+                            if (rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
+                            if (rule.type == "bool") bitOffset = prev.length;
+                            if(prev.length > 0) {
+                                var byteOffset = (prev.length * byteOffsetMultiplier);
+                                if (prev.offset != null) rule.offset = prev.offset + byteOffset;
+                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit + bitOffset;
+                            } else {
+                                if (prev.offset != null) rule.offset = prev.offset;
+                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit;
+                            }
+                            if (prev.scale != null) rule.scale = prev.scale;
+                            if (prev.length != null) rule.length = prev.length;
+                            if (prev.mask != null) rule.mask = prev.mask;
+                        }
+                    }
+
+                    container.css({
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                    });
+                    let fragment = document.createDocumentFragment();
+                    var row1 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row" }).appendTo(fragment);
+
+                    var _types = {
+                        value: "type",
+                        label: "Type",
+                        showLabel: true,
+                        options: [
+                            { value: "byte", label: "byte" },
+                            { value: "int8", label: "int8" },
+                            { value: "uint8", label: "uint8" },
+                            { value: "int16le", label: "int16 (le)" },
+                            { value: "int16be", label: "int16 (be)" },
+                            { value: "uint16le", label: "uint16 (le)" },
+                            { value: "uint16be", label: "uint16 (be)" },
+                            { value: "int32le", label: "int32 (le)" },
+                            { value: "int32be", label: "int32 (be)" },
+                            { value: "uint32le", label: "uint32 (le)" },
+                            { value: "uint32be", label: "uint32 (be)" },
+                            { value: "bigint64le", label: "bigint64 (le)" },
+                            { value: "bigint64be", label: "bigint64 (be)" },
+                            { value: "biguint64le", label: "biguint64 (le)" },
+                            { value: "biguint64be", label: "biguint64 (be)" },
+                            { value: "floatle", label: "float (le)" },
+                            { value: "floatbe", label: "float (be)" },
+                            { value: "doublele", label: "double (le)" },
+                            { value: "doublebe", label: "double (be)" },
+                            { value: "8bit", label: "8bit" },
+                            { value: "16bitle", label: "16bit (le)" },
+                            { value: "16bitbe", label: "16bit (be)" },
+                            { value: "bool", label: "bool" },
+                            { value: "bcdle", label: "bcd (le)" },
+                            { value: "bcdbe", label: "bcd (be)" },
+                            { value: "string", label: "string" },
+                            { value: "hex", label: "hex" },
+                            { value: "ascii", label: "ascii" },
+                            { value: "utf8", label: "utf8" },
+                            { value: "utf16le", label: "utf16 (le)" },
+                            { value: "ucs2", label: "ucs2" },
+                            { value: "latin1", label: "latin1" },
+                            { value: "binary", label: "binary" },
+                            { value: "buffer", label: "buffer" },
+                        ]
+                    }
+
+
+                    let row1_1 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
+                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "125px" })
+                        .appendTo(row1_1)
+                        .typedInput({ types: [{ label: "Name", value: "str" }] })
+
+                    let row1_2 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
+                    let typeField = $('<input/>', { class: "node-input-item-property-type", type: "text", width: "165px" })
+                        .appendTo(row1_2)
+                        .typedInput({ types: [_types] })
+                        
+                    let row1_3 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
+                    let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "110px" })
+                    .appendTo(row1_3)
+                    .typedInput({ types: [{ label: "Length", value: "num" }] })
+
+                    let row1_4 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
+                    let dataField = $('<input/>', { class: "node-input-item-property-data", type: "text", min: "0", width: "155px" })
+                        .appendTo(row1_4)
+                        .typedInput({ types: ['msg','flow','global','str','num','bool','bin','jsonata','env']});
+                   
+                    rule.type = coerceDataType(rule.type);
+                    typeField.typedInput('type', "type");
+                    typeField.typedInput('value', rule.type || "int16be");
+                    nameField.typedInput('type', "str");
+                    nameField.typedInput('value', rule.name || ("item" + (i + 1)));
+                    dataField.typedInput('type', rule.dataType || "msg");
+                    dataField.typedInput('value', rule.data || "payload");
+                    lengthField.typedInput('type', "num");
+                    lengthField.typedInput('value', rule.length || 1);
+
+                    container[0].appendChild(fragment);
+                },
+                removable: true,
+                sortable: true
+            });
+
+            for (var i = 0; i < this.items.length; i++) {
+                var item = this.items[i];
+                $("#node-input-items-container").editableList('addItem', item);
+            }
+
+        },
+        oneditsave: function () {
+            var items = $("#node-input-items-container").editableList('items');
+            var node = this;
+            node.items = [];
+            items.each(function (i) {
+                var rule = $(this);
+                var r = parseEditItem(rule);
+                node.items.push(r);
+            });
+        },
+        oneditresize: function (size) {
+            var rows = $("#dialog-form>div:not(.node-input-items-container-row)");
+            var height = size.height;
+            for (var i = 0; i < rows.length; i++) {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-items-container-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            height += 16;
+            $("#node-input-items-container").editableList('height', height);
+        }
+
+    });
+})()
+
+</script>
+
+<script type="text/html" data-template-name="buffer-maker">
+    <div class="form-row buffer-maker-form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row buffer-maker-form-row">
+        <label for="node-input-data"><i class="fa fa-ellipsis-h"></i><span data-i18n="buffer-maker.label.data"> Property</span></label>
+        <input type="hidden" id="node-input-dataType">
+        <input style="width: 70%" type="text" id="node-input-data" placeholder="">
+    </div>
+    <div class="form-row buffer-maker-form-row">
+        <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-maker.label.specification"> Specification</span></label>
+        <input type="hidden" id="node-input-specificationType">
+        <input style="width: 70%" type="text" id="node-input-specification" placeholder="">
+    </div>
+    <div class="form-row buffer-maker-form-row ui-row node-input-items-container-row"  id="ui-row5">
+        <ol id="node-input-items-container"></ol>
+    </div>
+    <div class="form-row buffer-maker-form-row ui-row" id="ui-row1">
+        <label for="node-input-swap1"><i class="fa fa-exchange"></i><span data-i18n="buffer-maker.label.swap"> Byte swap</span></label>
+        <span>
+            <input type="hidden" id="node-input-swap1Type">
+            <input style="width: 23%" type="text" id="node-input-swap1" placeholder=""> 
+            <input type="hidden" id="node-input-swap2Type">
+            <input style="width: 23%" type="text" id="node-input-swap2" placeholder=""> 
+            <input type="hidden" id="node-input-swap3Type">
+            <input style="width: 23%" type="text" id="node-input-swap3" placeholder=""> 
+        </span>
+    </div>
+    <div class="form-row buffer-maker-form-row ui-row" id="ui-row2">
+        <label for="node-input-msgProperty"><i class="fa fa-sign-out"></i><span data-i18n="buffer-maker.label.msgProperty"> Output property</span></label>
+        <input type="hidden" id="node-input-msgPropertyType">
+        <input style="width: 70%" type="text" id="node-input-msgProperty" placeholder="payload">
+    </div>
+</script>
+
+
+<style>
+    ol#node-input-items-container .red-ui-typedInput-container {
+        flex: 1;
+    }
+
+    .buffer-maker-form-row>label {
+        width: 120px !important;
+    }
+
+    .buffer-maker-row-item {
+        margin: 2px 4px 2px 2px;
+    }
+
+    .buffer-maker-row {
+        flex-wrap: wrap;
+    }
+
+    span.buffer-maker-prop-name {
+        padding: 0px 3px 2px 3px;
+        margin: 1px;
+        color: #AD1625;
+        white-space: nowrap;
+        background-color: #f7f7f9;
+        border: 1px solid #e1e1e8;
+        border-radius: 2px;
+        font-family: monospace;
+    }
+
+    span.buffer-maker-prop-type {
+        color: #666;
+        font-style: italic;
+        font-size: smaller;
+        padding-left: 5px;
+    }
+
+    span.buffer-maker-prop-desc {
+        /* color: #333; */
+        padding-left: 5px;
+    }
+
+    .buffer-maker-node-help div.buffer-maker-node-help-indent {
+        margin: 0px 0px 0px 6px;
+    }
+</style>
+
+<script type="text/html" data-help-name="buffer-maker">
+<p>A node that converts input data items into a buffer based on the specification provided</p>
+<h3>Foreword</h3>
+<dl class="message-properties">
+    A number of examples have been included to help you do some common tasks. To use the examples, press the hamburger menu <a id="red-ui-header-button-sidemenu" class="button" href="#"><i class="fa fa-bars"></i></a> select <b>import</b> then <b>examples</b>
+</dl>
+
+<h3>Output</h3>
+<dl class="message-properties">
+    <dt>payload <span class="property-type">object | []</span></dt>
+    <dd>the results.</dd>
+    <h4>NOTES:<br>
+        Payload can be set to an alternative <code>msg</code> property specified by "Output property"<br>
+        Additional useful properties are available in the <code>msg</code> object. Use a debug node (set to show complete output) to inspect them
+    </h4>
+</dl>
+
+<h3>UI specification</h3>
+    <h4><b>Property...</b></h4>
+    <div class="buffer-maker-node-help-indent">
+        The data to be processed in accordance with the specification. 
+    <div>
+    <h4><b>Specification...</b></h4>
+    <div class="buffer-maker-node-help-indent">
+        If Specification is set to "UI" then enter the specification in the fields provided below, otherwise, the specification must be an object provided in the format described below in <a href="#buffer-maker-help-dyn-spec">Dynamic specification</a>
+    <div>
+    <h4><b>Byte swap...</b></h4>
+    <div class="buffer-maker-node-help-indent">
+        Swap permits 16 bit, 32 bit or 64 bit swap options. Swap is applied to the whole data before extracting the items specified. If the 1st swap option is set to msg, flow, global, it must be an array containing any number of "swap16" "swap32" "swap64" strings. If the 1st swap option is set to env, then the environment variable must be set to a comma separated list of swaps e.g. swap32,swap16
+    <div>
+    <h4><b>Output property...</b></h4>
+    <div class="buffer-maker-node-help-indent">
+        This allows you to return the result in a property other than payload. For example, you can have results returned to <code>msg.output</code> or <code>msg.result.data</code>.
+    <div>
+
+    <h4><b>items...</b></h4>
+    <div class="buffer-maker-node-help-indent">
+        <ul>
+            <li><span class="buffer-maker-prop-name">name</span> <span class="buffer-maker-prop-desc"> A name to identify the resulting data.</span></li>
+            <li><span class="buffer-maker-prop-name">type</span> <span class="buffer-maker-prop-desc"> The type that input data should be written to the buffer as (see Allowable types below)</span></li>
+            <li><span class="buffer-maker-prop-name">length</span> <span class="buffer-maker-prop-desc"> The quantity of items to be written to the buffer. e.g. 12 floats or 34 int32s. NOTE: setting <code>length</code> to -1 will attempt to read all data items from the input data array. NOTE: If input data does not have enough bytes, the operation will fail.</span></li>
+        </ul>
+    <div>
+
+<h3 id="buffer-maker-help-dyn-spec">Dynamic specification</h3>
+    <div class="buffer-maker-node-help-indent">The <code>specification</code> can be passed in via msg, flow or global instead of being configured by the UI. The dynamic specification must be an object with the following properties...
+        <ul>
+            <li><span class="buffer-maker-prop-name">options</span> <span class="buffer-maker-prop-type">(Object)</span> <span class="buffer-maker-prop-desc"> processing options</span></li>
+            <li><span class="buffer-maker-prop-name">items</span> <span class="buffer-maker-prop-type">(Array)</span> <span class="buffer-maker-prop-desc"> array of items (see below) </span>
+        </ul>
+        <div>The <span class="buffer-maker-prop-name">options</span> object can have the following properties...
+            <ul>
+                <li><span class="buffer-maker-prop-name">byteSwap</span> <span class="buffer-maker-prop-type">(Boolean|Array|optional)</span> 
+                    <span class="buffer-maker-prop-desc"> swap all bytes before processing items. If <code>true</code>, then <code>swap16</code> will be performed.  If <code>byteSwap</code> is an Array (e.g. <code>["swap64", "swap32", "swap64", "swap16"]</code>) multiple swaps can be performed in the specified order  </span>
+                </li>
+                <li><span class="buffer-maker-prop-name">msgProperty</span> <span class="buffer-maker-prop-type">(String|optional)</span> <span class="buffer-maker-prop-desc"> How to return data.  By default, data will be sent in <code>msg.payload</code> - this can be changed as required. e.g. set <span class="buffer-maker-prop-name">msgProperty</span> to <b>newPayload.data</b> to have results sent to <code>msg.newPayload.data</code>  </span></li>
+            </ul>
+        </div>
+        <div>The <span class="buffer-maker-prop-name">items</span> array must contain 1 or more objects in the following format (not used when <code>resultType</code>="buffer")...
+            <ul>
+                <li><span class="buffer-maker-prop-name">name</span> <span class="buffer-maker-prop-type">(String)</span> <span class="buffer-maker-prop-desc"> A name to identify the resulting data.</span></li>
+                <li><span class="buffer-maker-prop-name">type</span> <span class="buffer-maker-prop-type">(String)</span> <span class="buffer-maker-prop-desc"> The type that input data should be written to the buffer as (see Allowable types below)</span></li>
+                <li><span class="buffer-maker-prop-name">length</span> <span class="buffer-maker-prop-type">(Number|optional)</span> <span class="buffer-maker-prop-desc"> The quantity of items to be written to the buffer. e.g. 12 floats or 34 int32s. NOTE: setting <code>length</code> to -1 will attempt to read all data items from the input data array. NOTE: If input data does not have enough bytes, the operation will fail.</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="buffer-maker-node-help-indent">Allowable <span class="buffer-maker-prop-name">type</span> options...
+        <ul>
+            <li>int, int8, byte, uint, uint8</li>
+            <li>int16, int16le, int16be, uint16, uint16le, uint16be</li>
+            <li>int32, int32le, int32be, uint32, uint32le, uint32be</li>
+            <li>bigint64, bigint64le, bigint64be, biguint64, biguint64le, biguint64be</li>
+            <li>float, floatle, floatbe, double, doublele, doublebe</li>
+            <li>8bit, 16bit 16bitle 16bitbe, bool</li>
+            <li>bcd, bcdle, bcdbe</li>
+            <li>string, hex, ascii, utf8, utf16le, ucs2, latin1, binary, buffer</li>
+            <li>NOTES...
+                <ul>
+                    <li>If <b>le</b> (little endian) or <b>be</b> (big endian) is not specified, <b>be</b> will be assumed</li>
+                    <li>bcd will convert the number to a 4BCD equivalent (bcd is not a standard buffer function)</li>
+                    <li>bool data must be provided in an array e.g. <code>[true,true,false,false]</code> </li>
+                    <li>8bit data must be provided in an array of 8bit arrays e.g. <code>[ [1,0,0,1,1,0,0,1], [1,1,0,0,1,1,0,0] ]</code> </li>
+                    <li>16bit data must be provided in an array of 16bit arrays e.g. <code>[ [1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1], [1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0] ]</code> </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="buffer-maker-node-help-indent">Example specification...
+        <pre><code style="font-size: smaller">
+{
+    "options": {
+        "byteSwap": ["swap32", "swap16"],
+        "msgProperty": "payload"
+    },
+    "items": [
+        {
+            "name": "myInts",
+            "type": "int",
+            "length": 6,
+            "data": "payload.myInts"
+            "dataType": "msg"
+        },
+        {
+            "name": "myInt16ArrayInFlow",
+            "type": "int16be",
+            "length": 6,
+            "data": "myInt16Array"
+            "dataType": "flow"
+        },
+        {
+            "name": "booleans",
+            "type": "bool",
+            "length": 8,
+            "data": "[true,true,false,false,true,true,false,false]"
+            "dataType": "json"
+        },
+        {
+            "name": "16bits",
+            "type": "16bit",
+            "length": 1,
+            "data": "[1,1,0,0,1,0,1,0,1,1,0,0,1,0,1,0]"
+            "dataType": "json"
+        },
+        {
+            "name": "myString",
+            "type": "string",
+            "length": -1,
+            "data": "title",
+            "dataType": "global"
+        }
+    ]
+}
+        </pre></code>
+    </div>
+    
+</script>

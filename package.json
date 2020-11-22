@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-buffer-parser",
-    "version": "2.6.0",
+    "version": "3.0.0",
     "description": "Convert values in a buffer, integer array or hex string into many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more",
     "keywords": [
         "node-red",
@@ -25,7 +25,8 @@
     },
     "node-red": {
         "nodes": {
-            "buffer-parser": "buffer-parser.js"
+            "buffer-parser": "buffer-parser.js",
+            "buffer-maker": "buffer-maker.js"
         }
     },
     "bugs": {
