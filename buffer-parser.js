@@ -17,18 +17,8 @@ copies or substantial portions of the Software.
 
 module.exports = function (RED) {
     const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
-    const SWAPOPTS = ["swap16", "swap32", "swap64"];
-    const TYPEOPTS = [
-        "int", "int8", "byte",
-        "uint", "uint8",
-        "int16", "int16le", "int16be", "uint16", "uint16le", "uint16be",
-        "int32", "int32le", "int32be", "uint32", "uint32le", "uint32be",
-        "bigint64", "bigint64le", "bigint64be", "biguint64", "biguint64le", "biguint64be",
-        "float", "floatle", "floatbe", "double", "doublele", "doublebe",
-        "8bit", "16bit", "16bitle", "16bitbe", "bool",
-        "bcd", "bcdle", "bcdbe",
-        "string", "hex", "ascii", "utf8", "utf16le", "ucs2", "latin1", "binary", "buffer"
-    ];
+    const { setObjectProperty, bcd2number, byteToBits, wordToBits, isNumber,TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
+
     function bufferParserNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -50,12 +40,6 @@ module.exports = function (RED) {
         node.resultTypeType = config.resultTypeType || 'str';
         node.multipleResult = config.multipleResult == true;
         node.setTopic = config.setTopic != false;
-
-
-        function isNumber(n) {
-            if (n === "" || n === true || n === false) return false;
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
 
         /**
          *  Generate a spec item from users input
@@ -206,23 +190,6 @@ module.exports = function (RED) {
         }
 
         /**
-         * helper function to dynamically set a nexted property by name
-         * @param {*} obj - the object in which to set a properties value
-         * @param {string} path - the path to the property e.g. payload.value
-         * @param {*} val - the value to set in obj.path
-         */
-        function setObjectProperty(obj, path, val, sep) {
-            sep = sep == null ? "=>" : sep;
-            const keys = path.split(sep);
-            const lastKey = keys.pop();
-            const lastObj = keys.reduce((obj, key) =>
-                obj[key] = obj[key] || {},
-                obj);
-            lastObj[lastKey] = val;
-        };
-
-
-        /**
          * parser function reads the provided `specification` (json or JS object) and converts the items in the `data` to the type specified in each element of `specification.items`
          *
          * @param {Buffer|integer[]} data - The data to parse. Must be either an array of `integer` or a `Buffer`
@@ -310,86 +277,6 @@ module.exports = function (RED) {
                         throw new Error("Cannot swap16: " + error.message);
                     }
                 }
-            }
-
-            //Get Bit
-            function getBit(number, bitPosition) {
-                return (number & (1 << bitPosition)) === 0 ? 0 : 1;
-            }
-            //Set Bit            
-            function setBit(number, bitPosition) {
-                return number | (1 << bitPosition);
-            }
-            //Clear Bit            
-            function clearBit(number, bitPosition) {
-                const mask = ~(1 << bitPosition);
-                return number & mask;
-            }
-            //Update Bit            
-            function updateBit(number, bitPosition, bitValue) {
-                const bitValueNormalized = bitValue ? 1 : 0;
-                const clearMask = ~(1 << bitPosition);
-                return (number & clearMask) | (bitValueNormalized << bitPosition);
-            }
-            function byteToBits(val) {
-                var bits = [];
-                for (let index = 0; index < 8; index++) {
-                    const bit = getBit(val, index);
-                    bits.push(bit);
-                }
-
-                return {
-                    bits: bits,
-                    bit0: bits[0],
-                    bit1: bits[1],
-                    bit2: bits[2],
-                    bit3: bits[3],
-                    bit4: bits[4],
-                    bit5: bits[5],
-                    bit6: bits[6],
-                    bit7: bits[7],
-                }
-            }
-            function wordToBits(val) {
-                var bits = [];
-                for (let index = 0; index < 16; index++) {
-                    const bit = getBit(val, index);
-                    bits.push(bit);
-                }
-                return {
-                    bits: bits,
-                    bit0: bits[0],
-                    bit1: bits[1],
-                    bit2: bits[2],
-                    bit3: bits[3],
-                    bit4: bits[4],
-                    bit5: bits[5],
-                    bit6: bits[6],
-                    bit7: bits[7],
-                    bit8: bits[8],
-                    bit9: bits[9],
-                    bit10: bits[10],
-                    bit11: bits[11],
-                    bit12: bits[12],
-                    bit13: bits[13],
-                    bit14: bits[14],
-                    bit15: bits[15],
-                }
-            }
-
-            //helper function to convert to bcd equivelant
-            var bcd2number = function (num, bytesize = 4) {
-                let loByte = (num & 0x00ff);
-                let hiByte = (num >> 8) & 0x00ff;
-                let n = 0;
-                n += (loByte & 0x0F) * 1;
-                if (bytesize < 2) return n;
-                n += ((loByte >> 4) & 0x0F) * 10;
-                if (bytesize < 3) return n;
-                n += (hiByte & 0x0F) * 100;
-                if (bytesize < 4) return n;
-                n += ((hiByte >> 4) & 0x0F) * 1000;
-                return n;
             }
 
             //helper function to return 1 or more correctly formatted values from the buffer

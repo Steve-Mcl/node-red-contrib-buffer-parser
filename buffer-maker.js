@@ -16,19 +16,8 @@ copies or substantial portions of the Software.
 */
 
 module.exports = function (RED) {
-    const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
-    const SWAPOPTS = ["swap16", "swap32", "swap64"];
-    const TYPEOPTS = [
-        "int", "int8", "byte",
-        "uint", "uint8",
-        "int16", "int16le", "int16be", "uint16", "uint16le", "uint16be",
-        "int32", "int32le", "int32be", "uint32", "uint32le", "uint32be",
-        "bigint64", "bigint64le", "bigint64be", "biguint64", "biguint64le", "biguint64be",
-        "float", "floatle", "floatbe", "double", "doublele", "doublebe",
-        "8bit", "16bit", "16bitle", "16bitbe", "bool",
-        "bcd", "bcdle", "bcdbe",
-        "string", "hex", "ascii", "utf8", "utf-8", "utf16le", "ucs2", "latin1", "binary", "buffer"
-    ];
+    const { number2bcd, bitsToByte, bitsToWord, setObjectProperty, isNumber, TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
+
     function bufferMakerNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -47,11 +36,6 @@ module.exports = function (RED) {
         node.msgProperty = config.msgProperty || 'payload';
         node.msgPropertyType = config.msgPropertyType || 'str';
 
-
-        function isNumber(n) {
-            if (n === "" || n === true || n === false) return false;
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
 
         /**
          *  Generate a spec item from users input
@@ -155,22 +139,6 @@ module.exports = function (RED) {
             return _spec;
         }
 
-        /**
-         * helper function to dynamically set a nexted property by name
-         * @param {*} obj - the object in which to set a properties value
-         * @param {string} path - the path to the property e.g. payload.value
-         * @param {*} val - the value to set in obj.path
-         */
-        function setObjectProperty(obj, path, val, sep) {
-            sep = sep == null ? "=>" : sep;
-            const keys = path.split(sep);
-            const lastKey = keys.pop();
-            const lastObj = keys.reduce((obj, key) =>
-                obj[key] = obj[key] || {},
-                obj);
-            lastObj[lastKey] = val;
-        };
-
 
         /**
          * maker function reads the provided `specification` (json or JS object) and converts the items into the a buffer/array
@@ -188,157 +156,9 @@ module.exports = function (RED) {
             
             var bufferExpectedLength = 0;
 
-            
             /** @type Buffer */ var buf = Buffer.alloc(0);
-            // let isArray = Array.isArray(data);
-            // let isBuffer = Buffer.isBuffer(data);
-            // if (typeof data == "string") {
-            //     data = new Buffer.from(data, "hex");
-            //     isBuffer = true;
-            // }
-            // if (!isArray && !isBuffer) {
-            //     throw new Error(`data is not an array or a buffer`);
-            // }
 
-            // //get buffer
-            // if (isBuffer) {
-            //     buf = data;
-            // }
-
-            // //convert int16 array to buffer for easy access to data
-            // if (isArray) {
-            //     buf = new Buffer.alloc(data.length * 2);
-            //     let pos = 0;
-            //     var arrayLength = data.length;
-            //     for (var i = 0; i < arrayLength; i++) {
-            //         let lb = (data[i] & 0x00ff);
-            //         let hb = ((data[i] & 0xff00) >> 8);
-            //         buf.writeUInt8(hb, pos++);
-            //         buf.writeUInt8(lb, pos++);
-            //     }
-            // }
-
-
-            //Get Bit
-            function getBit(number, bitPosition) {
-                return (number & (1 << bitPosition)) === 0 ? 0 : 1;
-            }
-            //Set Bit            
-            function setBit(number, bitPosition) {
-                return number | (1 << bitPosition);
-            }
-            //Clear Bit            
-            function clearBit(number, bitPosition) {
-                const mask = ~(1 << bitPosition);
-                return number & mask;
-            }
-            //Update Bit            
-            function updateBit(number, bitPosition, bitValue) {
-                const bitValueNormalized = bitValue ? 1 : 0;
-                const clearMask = ~(1 << bitPosition);
-                return (number & clearMask) | (bitValueNormalized << bitPosition);
-            }
-            function bitsToByte(bits) {
-                var byte = 0;
-                for (let index = 0; index < 8; index++) {
-                    let bit = bits[index];
-                    if(bit) byte = setBit(byte, index);
-                }
-                return byte;
-            }
-            function bitsToWord(val) {
-                var wd = 0;
-                for (let index = 0; index < 16; index++) {
-                    let bit = val[index];
-                    if(bit) wd = setBit(wd, index);
-                }
-                return wd;
-            }            
-            function byteToBits(val) {
-                var bits = [];
-                for (let index = 0; index < 8; index++) {
-                    const bit = getBit(val, index);
-                    bits.push(bit);
-                }
-
-                return {
-                    bits: bits,
-                    bit0: bits[0],
-                    bit1: bits[1],
-                    bit2: bits[2],
-                    bit3: bits[3],
-                    bit4: bits[4],
-                    bit5: bits[5],
-                    bit6: bits[6],
-                    bit7: bits[7],
-                }
-            }
-            function wordToBits(val) {
-                var bits = [];
-                for (let index = 0; index < 16; index++) {
-                    const bit = getBit(val, index);
-                    bits.push(bit);
-                }
-                return {
-                    bits: bits,
-                    bit0: bits[0],
-                    bit1: bits[1],
-                    bit2: bits[2],
-                    bit3: bits[3],
-                    bit4: bits[4],
-                    bit5: bits[5],
-                    bit6: bits[6],
-                    bit7: bits[7],
-                    bit8: bits[8],
-                    bit9: bits[9],
-                    bit10: bits[10],
-                    bit11: bits[11],
-                    bit12: bits[12],
-                    bit13: bits[13],
-                    bit14: bits[14],
-                    bit15: bits[15],
-                }
-            }
-
-            //helper function to convert to bcd equivalent
-            var bcd2number = function (num, bytesize = 4) {
-                let loByte = (num & 0x00ff);
-                let hiByte = (num >> 8) & 0x00ff;
-                let n = 0;
-                n += (loByte & 0x0F) * 1;
-                if (bytesize < 2) return n;
-                n += ((loByte >> 4) & 0x0F) * 10;
-                if (bytesize < 3) return n;
-                n += (hiByte & 0x0F) * 100;
-                if (bytesize < 4) return n;
-                n += ((hiByte >> 4) & 0x0F) * 1000;
-                return n;
-            }
-
-
-            /**
-             * number2bcd -> takes a number and returns the corresponding BCD in a nodejs buffer object.
-             * @param {Number} number number to convert to bcd
-             * @param {Number} [digits] no of digits (default 4)
-             * @returns {Buffer} nodejs buffer 
-             */
-            var number2bcd = function(number, digits) {
-                var s = digits || 4; //default value: 4
-                var n = 0;
-
-                n = (number % 10);
-                number = (number / 10)|0;
-                if (s < 2) return n;
-                n += (number % 10) << 4;
-                number = (number / 10)|0;
-                if (s < 3) return n;
-                n += (number % 10) << 8;
-                number = (number / 10)|0;
-                if (s < 4) return n;
-                n += (number % 10) << 12;
-                number = (number / 10)|0;
-                return n;
-            }
+ 
 
             //helper function to return 1 or more correctly formatted values from the buffer
             /**
