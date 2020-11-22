@@ -142,8 +142,8 @@ copies or substantial portions of the Software.
                 title: "output",
                 icon: "fa fa-sign-out",
                 options: [
-                    { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in payload.motor1.power.' },
-                    { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in payload.motor1.power.' },
+                    { label: "key/value", value: 'keyvalue', title: 'Send an object with results in key/value pairs in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in `msg.payload.motor1.power`.' },
+                    { label: "key/object", value: 'object', title: 'Send an object with results in key/object pairs (with the value and extended properties in the object) in the msg property specified by "Output property". Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in `msg.payload.motor1.power`.' },
                     { label: "values only (array)", value: 'value', title: 'Send a value (or array of values) in the msg property specified by "Output property"' },
                     { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"' },
                     { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"' },
@@ -642,8 +642,8 @@ copies or substantial portions of the Software.
     <h4><b>Output...</b></h4>
     <div class="buffer-parser-node-help-indent">
         <ul>
-            <li><span class="buffer-parser-prop-name">key/value</span> <span class="buffer-parser-prop-desc"> When key/value is selected, the payload will be the value only</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>payload.motor1.power</code>. </li>
-            <li><span class="buffer-parser-prop-name">key/object</span> <span class="buffer-parser-prop-desc">  When key/object is selected, the payload will be an object</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>payload.motor1.power</code>. </li>
+            <li><span class="buffer-parser-prop-name">key/value</span> <span class="buffer-parser-prop-desc"> When key/value is selected, the payload will be the value only</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>msg.payload.motor1.power</code>. </li>
+            <li><span class="buffer-parser-prop-name">key/object</span> <span class="buffer-parser-prop-desc">  When key/object is selected, the payload will be an object</span>. Use a fat arrow <code>=></code> in the name to create object.properties e.g. <code>motor1=>power</code> will end up in <code>msg.payload.motor1.power</code>. </li>
             <li><span class="buffer-parser-prop-name">value only</span> <span class="buffer-parser-prop-desc">  When value only is selected, the payload will be an array of values</span> </li>
             <li><span class="buffer-parser-prop-name">array</span> <span class="buffer-parser-prop-desc">  When array is selected, the payload will be an array of objects</span> </li>
             <li><span class="buffer-parser-prop-name">buffer</span> <span class="buffer-parser-prop-desc">  When value is selected, the payload will be a buffer. NOTE: No items will be processed (but byteswaps will be applied).</span> </li>

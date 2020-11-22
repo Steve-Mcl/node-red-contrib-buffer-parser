@@ -64,8 +64,8 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
   * ideal for converting multiple different data elements into one object to pass on to perhaps a template node for preparing a SQL or HTML statement using {{mustache}} formatting
   * additionally, output results can be 1 of 4 styles...
     * "value" : the parsed values are sent in an array 
-    * "keyvalue" : the parsed values are sent in an object as key/value pairs 
-    * "object" : the parsed values are sent as named objects with the value set `.value` and other contextual properties included (like the item specification)
+    * "keyvalue" : the parsed values are sent in an object as key/value pairs. Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in `msg.payload.motor1.power`.'
+    * "object" : the parsed values are sent as named objects with the value set `.value` and other contextual properties included (like the item specification).  Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in `msg.payload.motor1.power`.'
     * "array" : the parsed values are sent as objects in an array, with each object containing a `.value` property and other contextual properties included (like the item specification)
     * "buffer" : this mode simply returns a buffer (no item processing)
 * Final values can be masked (e.g. a MASK of `0x7FFF` could be used to remove the MSB)
