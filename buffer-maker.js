@@ -300,7 +300,7 @@ module.exports = function (RED) {
                 }
             }
 
-            //helper function to convert to bcd equivelant
+            //helper function to convert to bcd equivalent
             var bcd2number = function (num, bytesize = 4) {
                 let loByte = (num & 0x00ff);
                 let hiByte = (num >> 8) & 0x00ff;
@@ -314,31 +314,32 @@ module.exports = function (RED) {
                 n += ((hiByte >> 4) & 0x0F) * 1000;
                 return n;
             }
-            /**
-            * 
-            * number {number} 32 bit positive number, nodejs buffer size
-            * output: nodejs buffer 
-            */
+
 
             /**
              * number2bcd -> takes a number and returns the corresponding BCD in a nodejs buffer object.
              * @param {Number} number number to convert to bcd
-             * @param {Number} [size] no of bytes (default 2)
+             * @param {Number} [digits] no of digits (default 4)
              * @returns {Buffer} nodejs buffer 
              */
-            var number2bcd = function(number, size) {
-                var s = size || 2; //default value: 2
-                var bcd = Buffer.alloc(s,0);
-                bcd.fill(0);
-                while(number !== 0 && s !== 0) {
-                    s-=1;
-                    bcd[s] = (number % 10);
-                    number = (number / 10)|0;
-                    bcd[s] += (number % 10) << 4;
-                    number = (number / 10)|0;
-                }
-                return bcd;
+            var number2bcd = function(number, digits) {
+                var s = digits || 4; //default value: 4
+                var n = 0;
+
+                n = (number % 10);
+                number = (number / 10)|0;
+                if (s < 2) return n;
+                n += (number % 10) << 4;
+                number = (number / 10)|0;
+                if (s < 3) return n;
+                n += (number % 10) << 8;
+                number = (number / 10)|0;
+                if (s < 4) return n;
+                n += (number % 10) << 12;
+                number = (number / 10)|0;
+                return n;
             }
+
             //helper function to return 1 or more correctly formatted values from the buffer
             /**
              * 
@@ -657,22 +658,22 @@ module.exports = function (RED) {
                         {
                             let _byteCount;
                             let _len;
+                            let data = item.value;
+                            if(!Array.isArray(data)) data = [data];
                             if(length === -1) {
-                                _byteCount = item.value.length * 2;
-                                _len = item.value.length;
+                                _byteCount = data.length * 2;
+                                _len = data.length;
                             } else {
                                 _byteCount = length * 2;
                                 _len = length;
                             }
-                            if (_len > 1) {
-                                dataBCD = data.map(e => bcd2number(e));
-                            } else {
-                                dataBCD = bcd2number(data)
-                            }
+                            data = data.slice(0,_len);
+                            bufferExpectedLength += _byteCount;
+                            dataBCD = data.map(e => number2bcd(e));
                             let b = Buffer.alloc(_byteCount);
                             let fn = type === "bcdle" ? b.writeUInt16LE.bind(b) : b.writeUInt16BE.bind(b);
                             for (let index = 0; index < _len; index++) {
-                                fn(dataBCD[index],index);
+                                fn(dataBCD[index],index*2);
                             }
                             buf = appendBuffer(buf, b);
                         }
