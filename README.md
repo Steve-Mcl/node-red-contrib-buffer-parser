@@ -5,8 +5,9 @@ node-red-contrib-buffer-parser
 
 ## About
 
-A <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values in a buffer, integer array or hex string into many different data type(s). Supports Big/Little Endian, BCD, byte swapping and much more.
+A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to convert values to and from buffer/array. Supports Big/Little Endian, BCD, byte swapping and much more.
 
+<img src='data:image/png;base64,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'/>
 
 ## A picture is worth a thousand words
 
@@ -18,8 +19,27 @@ A <a href="http://nodered.org" target="_new">Node-RED</a> node to convert values
 ![example3b](/images/example3b.png) 
 
 
+## buffer-maker - Summary of functionality
+* Set-up a specification and convert multiple values into a buffer from...
+  * int, int8, byte, uint, uint8,
+  * int16, int16le, int16be, uint16, uint16le, uint16be,
+  * int32, int32le, int32be, uint32, uint32le, uint32be,
+  * bigint64, bigint64be, bigint64le, biguint64, biguint64be, biguint64le,
+  * float, floatle, floatbe, double, doublele, doublebe,
+  * 8bit, 16bit, 16bitle, 16bitbe, bool,
+  * bcd, bcdle, bcdbe,
+  * string, hex, ascii, utf8, utf16le, ucs2, latin1, binary, buffer 
+* Specification is either configured by the built in UI or can be set by a msg/flow/global 
+* Input data for each item to include in the final buffer can come from just about anywhere, making it very flexible...
+  * a constant (e.g. a number, a string, a boolean, a JSON array)
+  * a `msg` property (e.g from `msg.payload.myInteger`)
+  * a `flow` property (e.g from `flow.myInteger`)
+  * a `global` property (e.g from `global.myInteger`)
+* The final built buffer can be byte swapped one or more times. 16, 32 or 64 bit swaps are possible. The byte swaps are performed the data conversions like LE or BE functions (sometimes it is necessary to do multiple swaps) 
+* The final buffer can be output to any `msg` property (defaults to `msg.payload`)
+* Built in help
 
-## Summary of functionality
+## buffer-parser - Summary of functionality
 
 * Set-up a specification and convert multiple parts of an array or buffer to...
   * int, int8, byte, uint, uint8,
