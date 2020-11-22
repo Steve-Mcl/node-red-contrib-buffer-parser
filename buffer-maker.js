@@ -646,7 +646,7 @@ module.exports = function (RED) {
                             for (let index = 0; index < _len; index++) {
                                 const bits = item.value[index];
                                 const bval = bitsToWord(bits);
-                                fn(bval,index);
+                                fn(bval,index*2);
                             }
                             buf = appendBuffer(buf, b);
                             
