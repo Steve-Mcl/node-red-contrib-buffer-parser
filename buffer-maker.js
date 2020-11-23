@@ -669,7 +669,7 @@ module.exports = function (RED) {
                 let results = maker(data, validatedSpec, msg);
                 if (validatedSpec.options.singleResult !== false) {
                     msg.specification = results.specification;
-                    setObjectProperty(msg, validatedSpec.options.msgProperty, results.buffer)
+                    setObjectProperty(msg, validatedSpec.options.msgProperty, results.buffer, ".")
                     node.send(msg);
                 }
 

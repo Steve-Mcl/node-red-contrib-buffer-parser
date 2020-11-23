@@ -283,9 +283,9 @@ module.exports = function (RED) {
             function itemReader(item, buffer, bufferFunction, dataSize) {
                 item.value = dataGetter(buffer, item.offset, item.length, bufferFunction, dataSize, item.mask, item.scale);
                 // result.objectResults[item.name] = item;
-                setObjectProperty(result.objectResults, item.name, item);
+                setObjectProperty(result.objectResults, item.name, item, "=>");
                 // result.keyvalues[item.name] = item.value;
-                setObjectProperty(result.keyvalues, item.name, item.value);
+                setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                 result.arrayResults.push(item);
                 result.values.push(item.value);
             }
@@ -441,9 +441,9 @@ module.exports = function (RED) {
                             let _end =  length === -1 ? undefined : offset + length;
                             item.value = buf.toString(type, offset, _end);
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -476,9 +476,9 @@ module.exports = function (RED) {
                                 item.value = bitData.slice(item.offsetbit, item.offsetbit + length);
                             }
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -497,9 +497,9 @@ module.exports = function (RED) {
                             }
                             item.value = bitData;
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -521,9 +521,9 @@ module.exports = function (RED) {
                             }
                             item.value = bitData;
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -541,9 +541,9 @@ module.exports = function (RED) {
                             }
                             item.value = dataBCD;
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -553,9 +553,9 @@ module.exports = function (RED) {
                             let _end =  length === -1 ? undefined : offset + length;
                             item.value = buf.slice(offset, _end);
                             // result.objectResults[item.name] = item;
-                            setObjectProperty(result.objectResults, item.name, item);
+                            setObjectProperty(result.objectResults, item.name, item, "=>", "=>");
                             // result.keyvalues[item.name] = item.value;
-                            setObjectProperty(result.keyvalues, item.name, item.value);
+                            setObjectProperty(result.keyvalues, item.name, item.value, "=>", "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
@@ -573,10 +573,10 @@ module.exports = function (RED) {
                     switch (validatedSpec.options.resultType) {
                         case "value":
                         case "keyvalue":
-                            setObjectProperty(m, validatedSpec.options.msgProperty, item.value)
+                            setObjectProperty(m, validatedSpec.options.msgProperty, item.value, ".")
                             break;
                         case "object":
-                            setObjectProperty(m, validatedSpec.options.msgProperty, item)
+                            setObjectProperty(m, validatedSpec.options.msgProperty, item, ".")
                             break;
                     }
                     node.send(m);
@@ -720,20 +720,20 @@ module.exports = function (RED) {
 
                     switch (validatedSpec.options.resultType) {
                         case "buffer":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer, ".")
                             break;
                         case "value":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values, ".")
                             break;
                         case "object":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults, ".")
                             break;
                         case "keyvalue":
                         case "keyvalues":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues, ".")
                             break;
                         case "array":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults, ".")
                             break;
                     }
                     node.send(msg);
