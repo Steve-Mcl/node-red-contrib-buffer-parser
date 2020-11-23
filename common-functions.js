@@ -145,14 +145,14 @@ const TYPEOPTS = [
  * @param {*} val - the value to set in obj.path
  */
 function setObjectProperty(obj, path, val, sep) {
-    sep = sep == null ? "=>" : sep;
+    sep = sep == null ? "." : sep;
     const keys = path.split(sep);
     const lastKey = keys.pop();
     const lastObj = keys.reduce((obj, key) =>
         obj[key] = obj[key] || {},
         obj);
     lastObj[lastKey] = val;
-};
+}
 
 function isNumber(n) {
     if (n === "" || n === true || n === false) return false;
