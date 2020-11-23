@@ -294,7 +294,7 @@ module.exports = function (RED) {
                 try {
                     if (_mask) {
                         if (typeof _mask == "string" && _mask.trim() != "") {
-                            _mask = parseInt(_mask)
+                            _mask = Number(_mask)
                         }
                         if (isNaN(_mask)) {
                             if (throwError) throw new Error("mask " + mask + " is invalid")
@@ -573,9 +573,11 @@ module.exports = function (RED) {
                     switch (validatedSpec.options.resultType) {
                         case "value":
                         case "keyvalue":
+                            // RED.util.setObjectProperty(m,validatedSpec.options.msgProperty, item.value);
                             setObjectProperty(m, validatedSpec.options.msgProperty, item.value, ".")
                             break;
-                        case "object":
+                            case "object":
+                            // RED.util.setObjectProperty(m,validatedSpec.options.msgProperty, item);
                             setObjectProperty(m, validatedSpec.options.msgProperty, item, ".")
                             break;
                     }
@@ -721,19 +723,24 @@ module.exports = function (RED) {
                     switch (validatedSpec.options.resultType) {
                         case "buffer":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer, ".")
+                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer)
                             break;
                         case "value":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values, ".")
+                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values)
                             break;
                         case "object":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults, ".")
+                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults)
                             break;
                         case "keyvalue":
                         case "keyvalues":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues, ".")
+                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues)
                             break;
                         case "array":
                             setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults, ".")
+                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults)
                             break;
                     }
                     node.send(msg);
