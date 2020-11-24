@@ -18,11 +18,11 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
 ![example3](/images/example3.png) 
 ![example3b](/images/example3b.png) 
 
-### Output multiple values
+### Fan out
 ![example3](/images/fanned.png) 
 
 ### Scaling final values
-![example3](/images/fanned.png) 
+![example3](/images/scaling.png) 
 
 
 ## buffer-maker - Summary of functionality **(New in V3.0)**
