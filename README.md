@@ -18,6 +18,12 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
 ![example3](/images/example3.png) 
 ![example3b](/images/example3b.png) 
 
+### Output multiple values
+![example3](/images/fanned.png) 
+
+### Scaling final values
+![example3](/images/fanned.png) 
+
 
 ## buffer-maker - Summary of functionality **(New in V3.0)**
 * Set-up a specification and convert multiple values into a buffer from...
