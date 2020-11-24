@@ -702,18 +702,21 @@ copies or substantial portions of the Software.
                 <span class="buffer-parser-prop-name">scale</span> 
                 <span class="buffer-parser-prop-desc"> A multiplier or a simple Scale Equation to apply to the final value (after the mask). Supported Scaling Equations are...</span>
                 <ul>
-                <li class="buffer-parser-help-text"><code>&gt;&gt;</code> <span>e.g. <code>&gt;&gt;2</code> would bit shift the parsed value 2 places right</span></li>
-                <li class="buffer-parser-help-text"><code>&lt;&lt;</code> <span>e.g. <code>&lt;&lt;2</code> would bit shift the parsed value 2 places left</span></li>
-                <li class="buffer-parser-help-text"><code>+</code> <span>e.g. <code>+10</code> would add 10 to the parsed value </span></li>
-                <li class="buffer-parser-help-text"><code>-</code> <span>e.g. <code>-10</code> would deduct 10 from the parsed value </span></li>
-                <li class="buffer-parser-help-text"><code>/</code> <span>e.g. <code>/10</code> would divide the parsed value by 10</span></li>
-                <li class="buffer-parser-help-text"><code>*</code> <span>e.g. <code>*10</code> would multiply the parsed value by 10</span></li>
-                <li class="buffer-parser-help-text"><code>==</code> <span>e.g. <code>==10</code> would result in <code>true</code> if the parsed value was equal to 10</span></li>
-                <li class="buffer-parser-help-text"><code>!=</code> <span>e.g. <code>!=10</code> would result in <code>false</code> if the parsed value was equal to 10</span></li>
-                <li class="buffer-parser-help-text"><code>!</code> <span>e.g. <code>!</code> would result in <code>true</code> if the parsed value was <code>0</code> or <code>false</code> if the parsed value was not <code>0</code></span></li>
-                <li class="buffer-parser-help-text"><code>!!</code> <span>e.g. <code>!!</code> would result in <code>true</code> if the parsed value was <code>1</code> (same as <code>!!1 == true</code>) </span></li>
-                <li class="buffer-parser-help-text"><code>&gt;</code> <span>e.g. <code>&gt;10</code> would result in <code>true</code> if the parsed value was greater than 10</span></li>
-                <li class="buffer-parser-help-text"><code>&lt;</code> <span>e.g. <code>&lt;10</code> would result in <code>true</code> if the parsed value was less than 10</span></li>
+                    <li class="buffer-parser-help-text"><code>&lt;&lt;</code> <span>e.g. <code>&lt;&lt;2</code> would left shift the parsed value 2 places</span></li>
+                    <li class="buffer-parser-help-text"><code>&gt;&gt;</code> <span>e.g. <code>&gt;&gt;2</code> would right shift the parsed value 2 places</span></li>
+                    <li class="buffer-parser-help-text"><code>&gt;&gt;&gt;</code> <span>e.g. <code>&gt;&gt;&gt;2</code> would zero-fill right shift the parsed value 2 places (returns a 32bit unsigned value)</span></li>
+                    <li class="buffer-parser-help-text"><code>+</code> <span>e.g. <code>+10</code> would add 10 to the parsed value </span></li>
+                    <li class="buffer-parser-help-text"><code>-</code> <span>e.g. <code>-10</code> would deduct 10 from the parsed value </span></li>
+                    <li class="buffer-parser-help-text"><code>/</code> <span>e.g. <code>/10</code> would divide the parsed value by 10</span></li>
+                    <li class="buffer-parser-help-text"><code>*</code> <span>e.g. <code>*10</code> would multiply the parsed value by 10</span></li>
+                    <li class="buffer-parser-help-text"><code>**</code> <span>e.g. <code>**2</code> would raise the parsed value to the power of 2</span></li>
+                    <li class="buffer-parser-help-text"><code>^</code> <span>e.g. <code>^0xf0</code> would XOR the parsed value with 0xf0</span></li>
+                    <li class="buffer-parser-help-text"><code>==</code> <span>e.g. <code>==10</code> would result in <code>true</code> if the parsed value was equal to 10</span></li>
+                    <li class="buffer-parser-help-text"><code>!=</code> <span>e.g. <code>!=10</code> would result in <code>false</code> if the parsed value was equal to 10</span></li>
+                    <!-- <li class="buffer-parser-help-text"><code>!</code> <span>e.g. <code>!</code> would result in <code>true</code> if the parsed value was <code>0</code> or <code>false</code> if the parsed value was not <code>0</code></span></li> -->
+                    <li class="buffer-parser-help-text"><code>!!</code> <span>e.g. <code>!!</code> would result in <code>true</code> if the parsed value was <code>1</code> (same as <code>!!1 == true</code>) </span></li>
+                    <li class="buffer-parser-help-text"><code>&gt;</code> <span>e.g. <code>&gt;10</code> would result in <code>true</code> if the parsed value was greater than 10</span></li>
+                    <li class="buffer-parser-help-text"><code>&lt;</code> <span>e.g. <code>&lt;10</code> would result in <code>true</code> if the parsed value was less than 10</span></li>
                 </ul>
             </li>
         </ul>

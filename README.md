@@ -77,15 +77,17 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
   * e.g. Entering a Scale Equation of `>> 4` would bit shift the value `0x0070` to `0x0007`
   * e.g. Entering a Scale Equation of `+ 42` would add an offset of 42 to the final value **(New in V3.1)**
   * Supported Scaling Equations are...
-    * `>>` (e.g. `>>2` would bit shift the parsed value 2 places right
-    * `<<` (e.g. `<<2` would bit shift the parsed value 2 places left
+    * `<<` (e.g. `<<2` would left shift the parsed value 2 places
+    * `>>` (e.g. `>>2` would right shift the parsed value 2 places
+    * `>>>` (e.g. `>>>2` would zero-fill right shift the parsed value 2 places (returns a 32bit unsigned value)
     * `+` (e.g. `+10` would add 10 to the parsed value 
     * `-` (e.g. `-10` would deduct 10 from the parsed value 
     * `/` (e.g. `/10` would divide the parsed value by 10
     * `*` (e.g. `*10` would multiply the parsed value by 10
+    * `**` (e.g. `**2` would raise the parsed value to the power of 2
+    * `^` (e.g. `^0xf0` would XOR the parsed value with 0xf0
     * `==` (e.g. `==10` would result in `true` if the parsed value was equal to 10
     * `!=` (e.g. `!=10` would result in `false` if the parsed value was equal to 10
-    * `!` (e.g. `!` would result in `true` if the parsed value was `0` or `false` if the parsed value was not `0`
     * `!!` (e.g. `!!` would result in `true` if the parsed value was `1` (same as `!!1 == true`) 
     * `>` (e.g. `>10` would result in `true` if the parsed value was greater than 10
     * `<` (e.g. `<10` would result in `true` if the parsed value was less than 10
