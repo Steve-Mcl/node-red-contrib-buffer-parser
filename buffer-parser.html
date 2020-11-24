@@ -32,6 +32,28 @@ copies or substantial portions of the Software.
         '16bit': '16bitbe',
         'boolean': 'bool'
     }
+    function describeItem (item, index) {
+        var t = "Item " + (index+1) + ": '" + item.name + "' {" + item.type + "}" 
+        if (item.offset) t += ", offset " + item.offset;
+        if (item.offsetbit) t += ", offsetbit " + item.offsetbit;
+        if (item.scale && item.scale != "0" && item.scale != "1") t += ", scale " + item.scale;
+        if (item.length) t += ", length " + item.length;
+        return t;
+    }
+    function describeConfig(node) {
+        var uiSpec = node.specificationType == "ui";
+        if(!uiSpec) return "Dynamic";
+        var itemCount = (node && node.items) ? node.items.length : 0;
+        var t = "Output: ";
+        if(node.multipleResult) {
+            t += itemCount + (itemCount = 1 ? " item" : " items") 
+            if(node.setTopic) 
+                t += " (with topic set to item name)";
+        } else {
+            t += node.resultType + " with " + itemCount + (itemCount == 1 ? " property" : " properties") 
+        }
+        return t;
+    }
     function coerceDataType(t) {
         return compatibleDataTypes[t] || t;
     }
@@ -111,6 +133,14 @@ copies or substantial portions of the Software.
         inputs: 1,
         outputs: 1,
         icon: "font-awesome/fa-expand",
+        outputLabels: function(index) {
+            var node = this;
+            var item = node.items && node.items[index];
+            if (item) {
+                if(node.multipleResult && node.fanOutMultipleResult) return describeItem(item, index);
+                return describeConfig(node);
+            }
+        },
         label: function () {
             return this.name || "buffer parser";
         },
