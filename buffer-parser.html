@@ -75,7 +75,7 @@ copies or substantial portions of the Software.
             r.offset = parseInt(rule.find(".node-input-item-property-offset").val() || 0);
             r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
             r.offsetbit = parseInt(rule.find(".node-input-item-property-offsetbit").val() || 0);
-            r.scale = parseFloat(rule.find(".node-input-item-property-scale").val() || 0);
+            r.scale = rule.find(".node-input-item-property-scale").val() || 0;
             r.mask = rule.find(".node-input-item-property-mask").val() || '';
             return r;
         } catch (error) { }
@@ -104,7 +104,9 @@ copies or substantial portions of the Software.
             resultType: { value: "keyvalue" },
             resultTypeType: { value: "return" },
             multipleResult: { value: false },
+            fanOutMultipleResult: { value: false },
             setTopic: { value: true },
+            outputs: {value:1}
         },
         inputs: 1,
         outputs: 1,
@@ -170,6 +172,7 @@ copies or substantial portions of the Software.
             //var msgPropertyField = sti('msgProperty', ['str', 'msg', 'flow', 'global', 'env'], 'str');//specification
             var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
             var multipleResultField = $("#node-input-multipleResult");
+            var fanOutMultipleResultField = $("#node-input-fanOutMultipleResult");
             var setTopicField = $("#node-input-setTopic");
             specificationField.on("change", function () {
                 var v = $(this).val();
@@ -204,6 +207,11 @@ copies or substantial portions of the Software.
                 } else {
                     $("#node-input-resultType").typedInput("types", [returnOpt]);
                 }
+                $("#node-input-setTopic").prop("disabled", !v);
+                $("#node-input-fanOutMultipleResult").prop("disabled", !v);
+                var l = node.items.length || 1;
+                $("#node-input-outputs").val(l);
+                node.outputs = l;
             });
 
             sw1.on("change", function () {
@@ -229,9 +237,6 @@ copies or substantial portions of the Software.
                 }
             });
 
-            $("#node-input-multipleResult").on("change", function () {
-                $("#node-input-setTopic").prop("disabled", !this.checked);
-            })
 
             //in place upgrade from JSON specification to new UI
             if (node.specification && node.specificationType == "json") {
@@ -259,6 +264,7 @@ copies or substantial portions of the Software.
                     var st = importSpec.options.setTopic === false ? false : true;
 
                     multipleResultField.prop("checked", mr);
+                    fanOutMultipleResultField.prop("checked", false);//not possible
                     setTopicField.prop("checked", st);
 
                     specificationField.typedInput("type", "ui");
@@ -408,9 +414,9 @@ copies or substantial portions of the Software.
                         .typedInput({ types: [{ label: "bit offset", value: "num" }] })
 
                     let row1_7 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let scaleField = $('<input/>', { class: "node-input-item-property-scale", type: "number", min: "0.0", step: "0.1", width: "110px" })
+                    let scaleField = $('<input/>', { class: "node-input-item-property-scale", width: "110px" })
                         .appendTo(row1_7)
-                        .typedInput({ types: [{ label: "scale", value: "num" }] })
+                        .typedInput({ types: [{ label: "scale", value: "str", icon: "fa fa-calculator"  }] })
 
 
                     typeField.on("change", function () {
@@ -482,6 +488,16 @@ copies or substantial portions of the Software.
                 var r = parseEditItem(rule);
                 node.items.push(r);
             });
+            var multipleResult = $("#node-input-multipleResult").prop("checked");
+            var fanOutMultipleResult = $("#node-input-fanOutMultipleResult").prop("checked");
+            if(multipleResult && fanOutMultipleResult) {
+                var l = items.length || 1;
+                $("#node-input-outputs").val(l);
+                node.outputs = l;
+            } else {
+                $("#node-input-outputs").val(1);
+                node.outputs = 1;
+            }
         },
         oneditresize: function (size) {
             var rows = $("#dialog-form>div:not(.node-input-items-container-row)");
@@ -534,12 +550,16 @@ copies or substantial portions of the Software.
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row3">
         <label><i class="fa fa-sign-out"></i> <span data-i18n="buffer-parser.label.returnOptions"> Output options</span></label>
         <span>
-            <label for="node-input-multipleResult" style="width:35%">
+            <label for="node-input-multipleResult" style="width:23%">
                 <input type="checkbox" id="node-input-multipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.multipleResult">multiple results</span>
             </label>
-            <label for="node-input-setTopic" style="width:35%">
+            <label for="node-input-setTopic" style="width:23%">
                 <input type="checkbox" id="node-input-setTopic" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.setTopic">set topic</span>
             </label>
+            <label for="node-input-fanOutMultipleResult" style="width:23%">
+                <input type="checkbox" id="node-input-fanOutMultipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.fanOut">fan out</span>
+            </label>
+            <input type="hidden" id="node-input-outputs"/>
         </span>
     </div>
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row4">
@@ -596,6 +616,25 @@ copies or substantial portions of the Software.
     .buffer-parser-node-help div.buffer-parser-node-help-indent {
         margin: 0px 0px 0px 6px;
     }
+
+    li.buffer-parser-help-text {
+        list-style-type: none; /* Remove bullets */
+        margin-left: -18px;
+    }
+
+    li.buffer-parser-help-text > code {
+        display: inline-block;
+        width: 24px;
+    }  
+
+    li.buffer-parser-help-text > span {
+        color: #333;
+        font-size: smaller;
+    }
+    li.buffer-parser-help-text > span > code {
+        font-size: small;
+    }
+
 </style>
 
 <script type="text/html" data-help-name="buffer-parser">
@@ -637,6 +676,7 @@ copies or substantial portions of the Software.
         <ul>
             <li><span class="buffer-parser-prop-name">multiple results</span> <span class="buffer-parser-prop-desc"> When false, a single result is returned in the <code>msg</code> property specified by "Output property". When true, 1 result per item is returned in the <code>msg</code> property specified by "Output property"</span></li>
             <li><span class="buffer-parser-prop-name">set topic</span> <span class="buffer-parser-prop-desc"> When false, <code>msg.topic</code> will be unmodified. When true, <code>msg.topic</code> will be set to the value of <code>name</code>. </span></li>
+            <li><span class="buffer-parser-prop-name">fan out</span> <span class="buffer-parser-prop-desc"> When true, multiple output pins will be added to the node and each result will be sent out of its own pin. </span></li>
         </ul>         
     <div>
     <h4><b>Output...</b></h4>
@@ -658,7 +698,24 @@ copies or substantial portions of the Software.
             <li><span class="buffer-parser-prop-name">length</span> <span class="buffer-parser-prop-desc"> The quantity of items to be returned. e.g. 6 bools or 12 floats or 34 int32s. NOTE: setting <code>length</code> to -1 will attempt to read all bytes from offset to the end. NOTE: If source data does not have enough bytes, the operation will fail.</span></li>
             <li><span class="buffer-parser-prop-name">offsetbit</span> <span class="buffer-parser-prop-desc"> The first bit to return when specifying <span class="buffer-parser-prop-name">type</span> bool. e.g. requesting <span class="buffer-parser-prop-name">offsetbit</span> 6 and a <span class="buffer-parser-prop-name">length</span> of 3 will return byte0-bit6, byte0-bit7 and byte1-bit0 </span></li>
             <li><span class="buffer-parser-prop-name">mask</span> <span class="buffer-parser-prop-desc"> An optional mask to apply to the final data value. Enter a decimal mask e.g 65535 or a hexadecimal mask e.g. 0xffff</span></li>
-            <li><span class="buffer-parser-prop-name">scale</span> <span class="buffer-parser-prop-desc"> A multiplier to apply to the final value. e.g. entering 0.1 will divide the final value by 10.  Entering 10 will multiply the final value by 10</span></li>
+            <li><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAxUlEQVRYR+2XUQ6CMAyGP+4hiZ7MBw+CHsQHT6YJ3kNTEpNSDUW24RK7N9bQfvzZWv6G8ToCe2Br9nM93oALIHWG1ajMstnlquTkOb0gNEAPbFYCuAOtVeCxUvGR+loBC6BjOdg+5g+AUCAUqFqBHHd/Ksfw8VMKBMDPFbCzwJsVi+Lf3IJFBZSMycPo/wBSD+GsM1SyDwRAsgKzEnjXzItHH6hagdQ+4L3/9j9wLWhKLYyY1F115lSAxCEfCppUMaVnbc+fO91MIQGBj78AAAAASUVORK5CYII=" style="height:16px;" >
+                <span class="buffer-parser-prop-name">scale</span> 
+                <span class="buffer-parser-prop-desc"> A multiplier or a simple Scale Equation to apply to the final value (after the mask). Supported Scaling Equations are...</span>
+                <ul>
+                <li class="buffer-parser-help-text"><code>&gt;&gt;</code> <span>e.g. <code>&gt;&gt;2</code> would bit shift the parsed value 2 places right</span></li>
+                <li class="buffer-parser-help-text"><code>&lt;&lt;</code> <span>e.g. <code>&lt;&lt;2</code> would bit shift the parsed value 2 places left</span></li>
+                <li class="buffer-parser-help-text"><code>+</code> <span>e.g. <code>+10</code> would add 10 to the parsed value </span></li>
+                <li class="buffer-parser-help-text"><code>-</code> <span>e.g. <code>-10</code> would deduct 10 from the parsed value </span></li>
+                <li class="buffer-parser-help-text"><code>/</code> <span>e.g. <code>/10</code> would divide the parsed value by 10</span></li>
+                <li class="buffer-parser-help-text"><code>*</code> <span>e.g. <code>*10</code> would multiply the parsed value by 10</span></li>
+                <li class="buffer-parser-help-text"><code>==</code> <span>e.g. <code>==10</code> would result in <code>true</code> if the parsed value was equal to 10</span></li>
+                <li class="buffer-parser-help-text"><code>!=</code> <span>e.g. <code>!=10</code> would result in <code>false</code> if the parsed value was equal to 10</span></li>
+                <li class="buffer-parser-help-text"><code>!</code> <span>e.g. <code>!</code> would result in <code>true</code> if the parsed value was <code>0</code> or <code>false</code> if the parsed value was not <code>0</code></span></li>
+                <li class="buffer-parser-help-text"><code>!!</code> <span>e.g. <code>!!</code> would result in <code>true</code> if the parsed value was <code>1</code> (same as <code>!!1 == true</code>) </span></li>
+                <li class="buffer-parser-help-text"><code>&gt;</code> <span>e.g. <code>&gt;10</code> would result in <code>true</code> if the parsed value was greater than 10</span></li>
+                <li class="buffer-parser-help-text"><code>&lt;</code> <span>e.g. <code>&lt;10</code> would result in <code>true</code> if the parsed value was less than 10</span></li>
+                </ul>
+            </li>
         </ul>
     <div>
 
@@ -714,7 +771,7 @@ copies or substantial portions of the Software.
             </li>    
         </ul>
     </div>    
-    <div class="buffer-parser-node-help-indent">Example specification...
+    <div class="buffer-parser-node-help-indent">Example dynamic specification...
         <pre><code style="font-size: smaller">
 {
     "options": {
@@ -726,10 +783,11 @@ copies or substantial portions of the Software.
     },
     "items": [
         {
-            "name": "myInt_x_10",
+            "name": "digit1",
             "type": "int",
             "offset": 4,
-            "scale": 10
+            "mask": "0x00f0"
+            "scale": ">> 4"
         },
         {
             "name": "myInt16Array_LE_divided_by_100",

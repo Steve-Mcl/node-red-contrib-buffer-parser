@@ -18,7 +18,22 @@ copies or substantial portions of the Software.
 module.exports = function (RED) {
     const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
     const { setObjectProperty, bcd2number, byteToBits, wordToBits, isNumber,TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
-
+    const scalingOps = {
+        ">": (v, o) => v > o,
+        "<": (v, o) => v < o,
+        "==": (v, o) => v == o,
+        "!=": (v, o) => v != o,
+        "%": (v, o) => v % o,
+        ">>": (v, o) => v >> o,
+        "<<": (v, o) => v << o,
+        "/": (v, o) => v / o,
+        "*": (v, o) => v * o,
+        "+": (v, o) => v + o,
+        "-": (v, o) => v - o,
+        "!": (v) => !v,
+        "!!": (v) => !!v,
+    };
+    const scalerRegex = /\s*?([\/\<\>\-\+\*\!\=\%]*?)\s*?(\w+)/g;
     function bufferParserNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -39,6 +54,7 @@ module.exports = function (RED) {
         node.resultType = config.resultType || 'value';
         node.resultTypeType = config.resultTypeType || 'str';
         node.multipleResult = config.multipleResult == true;
+        node.fanOutMultipleResult = node.multipleResult == true && config.fanOutMultipleResult == true;
         node.setTopic = config.setTopic != false;
 
         /**
@@ -119,15 +135,38 @@ module.exports = function (RED) {
                 throw new Error("offsetbit is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
             }
 
-            //ensure scale is something
-            if (formattedSpecItem.scale == null || formattedSpecItem.scale == undefined) {
-                formattedSpecItem.scale = 0;
+            //compile scaler
+            
+            if(formattedSpecItem.scale && formattedSpecItem.scale != 1) {
+                try {
+                    var scale = formattedSpecItem.scale.trim();
+                    formattedSpecItem.scaler = {
+                        operator: '*',
+                        operand: Number(scale)
+                    }
+                    if(scale == "!" || scale == "!!") scale += "0"
+                    const matches = scale.matchAll(scalerRegex);
+                    for (const match of matches) {
+                        formattedSpecItem.scaler = {
+                            operator: match["1"].trim(),
+                            operand: Number(match["2"])
+                        }
+                        break;
+                    }
+                } catch (e) {
+                }
             }
-            if (isNumber(formattedSpecItem.scale)) {
-                formattedSpecItem.scale = parseFloat(formattedSpecItem.scale);
-            } else {
-                throw new Error("scale is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
-            }
+
+
+            // //ensure scale is something
+            // if (formattedSpecItem.scale == null || formattedSpecItem.scale == undefined) {
+            //     formattedSpecItem.scale = 0;
+            // }
+            // if (isNumber(formattedSpecItem.scale)) {
+            //     formattedSpecItem.scale = Number(formattedSpecItem.scale);
+            // } else {
+            //     throw new Error("scale is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
+            // }
 
             return formattedSpecItem;
         }
@@ -281,7 +320,7 @@ module.exports = function (RED) {
 
             //helper function to return 1 or more correctly formatted values from the buffer
             function itemReader(item, buffer, bufferFunction, dataSize) {
-                item.value = dataGetter(buffer, item.offset, item.length, bufferFunction, dataSize, item.mask, item.scale);
+                item.value = dataGetter(buffer, item.offset, item.length, bufferFunction, dataSize, item.mask, item.scaler);
                 // result.objectResults[item.name] = item;
                 setObjectProperty(result.objectResults, item.name, item, "=>");
                 // result.keyvalues[item.name] = item.value;
@@ -306,9 +345,8 @@ module.exports = function (RED) {
                 return _mask;
             }
             //helper function to return 1 or more correctly formatted values from the buffer
-            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask, scale) {
-
-                var _mask = sanitizeMask(mask)
+            function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask, scaler) {
+                var _mask = sanitizeMask(mask);
                 let index = 0;
                 let value;
                 if (dataCount === -1) {
@@ -321,8 +359,15 @@ module.exports = function (RED) {
                 for (index = 0; index < dataCount; index++) {
                     let bufPos = startByte + (index * dataSize);
                     let val = fn(bufPos);//call specified function on the buffer
-                    if (_mask) val = (val & _mask)
-                    if (scale && scale != 1) val = val * scale;
+                    if (_mask) val = (val & _mask);
+                    // if (scale && scale != 1) val = val * scale;
+                    if(scaler) {
+                        if (scaler.operator) {
+                            if (scalingOps[scaler.operator]) val = scalingOps[scaler.operator](val, scaler.operand);
+                        } else if (scaler.operand && scaler.operand !== 1) {
+                            val = val * scaler.operand; //multiplier
+                        }
+                    }
                     if (dataCount > 1) {
                         value.push(val);
                     } else {
@@ -341,7 +386,7 @@ module.exports = function (RED) {
             }
 
             var itemCount = validatedSpec.items.length;
-
+            var fanOut = [];
             for (var itemIndex = 0; itemIndex < itemCount; itemIndex++) {
                 let item = validatedSpec.items[itemIndex];
                 let type = item.type;
@@ -581,8 +626,17 @@ module.exports = function (RED) {
                             setObjectProperty(m, validatedSpec.options.msgProperty, item, ".")
                             break;
                     }
-                    node.send(m);
+                    if(node.fanOutMultipleResult) {
+                        fanOut[itemIndex] = m;
+                        //node.send(ms);
+                    } else {
+                        node.send(m);
+                    }
+                    
                 }
+            }
+            if(node.fanOutMultipleResult) {
+                return fanOut;
             }
             return result;
         }
@@ -744,6 +798,8 @@ module.exports = function (RED) {
                             break;
                     }
                     node.send(msg);
+                } else if(node.fanOutMultipleResult) {
+                    node.send(results);
                 }
 
             } catch (error) {

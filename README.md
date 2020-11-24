@@ -19,7 +19,7 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
 ![example3b](/images/example3b.png) 
 
 
-## buffer-maker - Summary of functionality
+## buffer-maker - Summary of functionality **(New in V3.0)**
 * Set-up a specification and convert multiple values into a buffer from...
   * int, int8, byte, uint, uint8,
   * int16, int16le, int16be, uint16, uint16le, uint16be,
@@ -60,6 +60,7 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
 * Input data can be a hex string e.g. `1FE2D7FFBE`
 * Output results can be multiple messages as `topic` and `payload` 
   * ideal for taking PLC data and sending it directly to MQTT
+* Output results can be multiple messages fanned out so that each item in the specification is sent out of its own output **(New in V3.1)**
 * Output results can be a single msg style output
   * ideal for converting multiple different data elements into one object to pass on to perhaps a template node for preparing a SQL or HTML statement using {{mustache}} formatting
   * additionally, output results can be 1 of 4 styles...
@@ -68,7 +69,27 @@ A pair of <a href="http://nodered.org" target="_new">Node-RED</a> nodes to conve
     * "object" : the parsed values are sent as named objects with the value set `.value` and other contextual properties included (like the item specification).  Use a fat arrow `=>` in the name to create object.properties e.g. `motor1=>power` will end up in `msg.payload.motor1.power`.'
     * "array" : the parsed values are sent as objects in an array, with each object containing a `.value` property and other contextual properties included (like the item specification)
     * "buffer" : this mode simply returns a buffer (no item processing)
-* Final values can be masked (e.g. a MASK of `0x7FFF` could be used to remove the MSB)
+* Final values can be masked (e.g. a MASK of `0x7FFF` could be used to remove the MSB or `0b1000000000000001` to keep only MSB and LSB)
+  * Binary and Octal masks only available in **V3.1** onwards
+* Final values can be have a Scale value or a simple Scale Equation  **(New in V3.1)** applied...
+  * e.g. Entering a Scale value of `0.01` would turn `9710` into `97.1` 
+  * e.g. Entering a Scale value of `10` would turn `4.2` into `42` 
+  * e.g. Entering a Scale Equation of `>> 4` would bit shift the value `0x0070` to `0x0007`
+  * e.g. Entering a Scale Equation of `+ 42` would add an offset of 42 to the final value **(New in V3.1)**
+  * Supported Scaling Equations are...
+    * `>>` (e.g. `>>2` would bit shift the parsed value 2 places right
+    * `<<` (e.g. `<<2` would bit shift the parsed value 2 places left
+    * `+` (e.g. `+10` would add 10 to the parsed value 
+    * `-` (e.g. `-10` would deduct 10 from the parsed value 
+    * `/` (e.g. `/10` would divide the parsed value by 10
+    * `*` (e.g. `*10` would multiply the parsed value by 10
+    * `==` (e.g. `==10` would result in `true` if the parsed value was equal to 10
+    * `!=` (e.g. `!=10` would result in `false` if the parsed value was equal to 10
+    * `!` (e.g. `!` would result in `true` if the parsed value was `0` or `false` if the parsed value was not `0`
+    * `!!` (e.g. `!!` would result in `true` if the parsed value was `1` (same as `!!1 == true`) 
+    * `>` (e.g. `>10` would result in `true` if the parsed value was greater than 10
+    * `<` (e.g. `<10` would result in `true` if the parsed value was less than 10
+  * NOTE: the scale/equation is applied AFTER the mask
 * Final values can be have a scale applied (e.g. a scale of `0.01` would turn `9710` into `97.1` or a scale of 10 would turn `50` into `500`) 
   * NOTE: the scale is applied AFTER the mask
 * Built in help
