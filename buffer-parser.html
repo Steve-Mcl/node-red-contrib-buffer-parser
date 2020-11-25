@@ -234,14 +234,20 @@ copies or substantial portions of the Software.
                 var v = this.checked;
                 if (v) {
                     $("#node-input-resultType").typedInput("types", [returnOpt2]);
+                    if($("#node-input-fanOutMultipleResult").prop("checked")) {
+                        var l = node.items.length || 1;
+                        // console.log("setting outputs to " + l)
+                        $("#node-input-outputs").val(l);
+                        node.outputs = l;
+                    }                    
                 } else {
                     $("#node-input-resultType").typedInput("types", [returnOpt]);
+                    // console.log("setting outputs to " + 1)
+                    $("#node-input-outputs").val(1);
+                    node.outputs = 1;
                 }
                 $("#node-input-setTopic").prop("disabled", !v);
                 $("#node-input-fanOutMultipleResult").prop("disabled", !v);
-                var l = node.items.length || 1;
-                $("#node-input-outputs").val(l);
-                node.outputs = l;
             });
 
             sw1.on("change", function () {
