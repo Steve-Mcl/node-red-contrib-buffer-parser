@@ -33,7 +33,34 @@ copies or substantial portions of the Software.
         'boolean': 'bool'
     }
     function describeItem (item, index) {
-        return item ? item.name + " {" + item.type + "}" : "";
+        if(!item) return "";
+        var name = item.name;
+        var typeInfo = item.type;
+        if(item.scale) {
+            var operator = "";
+            try {
+                var scale = item.scale.trim();
+                if(scale == "!" || scale == "!!") {
+                    operator = scale;
+                } else {
+                    var matches = scale.matchAll( /\s*?([\/\-\+\*<>^!%=]*?)\s*?(\w+)/g);
+                    for (const match of matches) {
+                        operator = match["1"].trim();
+                        break;
+                    }
+                }
+            } catch (e) { }
+            switch (operator) {
+                case "!":
+                case "!!":
+                case ">":
+                case "<":
+                case "==":
+                case "!=":
+                typeInfo = "boolean";
+            }
+        }
+        return name + " {" + typeInfo + "}";
     }
     function describeConfig(node) {
         var uiSpec = node.specificationType == "ui";
