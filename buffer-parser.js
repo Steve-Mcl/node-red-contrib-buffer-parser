@@ -35,7 +35,7 @@ module.exports = function (RED) {
         "-": (v, o) => v - o,
         "!!": (v) => !!v,
     };
-    const scalerRegex = /\s*?([\/\-\+\*<>^!%]*?)\s*?(\w+)/g;
+    const scalerRegex = /\s*?([\/\-\+\*<>^!%=]*?)\s*?(\w+)/g;
     function bufferParserNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
