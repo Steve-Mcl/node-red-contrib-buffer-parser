@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 <script type="text/javascript">
 
 (function () {
-    //console.log("Initialising node-red-contrib-buffer-parser"); //uncomment me to help locate SRC in devtools!
+    console.log("Initialising buffer-parser"); //uncomment me to help locate SRC in devtools!
     var compatibleDataTypes = {
         'int': 'int8',
         'uint': 'uint8',
@@ -522,9 +522,11 @@ copies or substantial portions of the Software.
             var fanOutMultipleResult = $("#node-input-fanOutMultipleResult").prop("checked");
             if(multipleResult && fanOutMultipleResult) {
                 var l = items.length || 1;
+                // console.log("setting outputs to " + l)
                 $("#node-input-outputs").val(l);
                 node.outputs = l;
             } else {
+                // console.log("setting outputs to " + 1)
                 $("#node-input-outputs").val(1);
                 node.outputs = 1;
             }
