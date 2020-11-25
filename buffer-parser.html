@@ -583,13 +583,13 @@ copies or substantial portions of the Software.
         <label><i class="fa fa-sign-out"></i> <span data-i18n="buffer-parser.label.returnOptions"> Output options</span></label>
         <span>
             <label for="node-input-multipleResult" style="width:23%">
-                <input type="checkbox" id="node-input-multipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.multipleResult">multiple results</span>
+                <input type="checkbox" id="node-input-multipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" title="Send a separate message for each item" autocomplete="off"><span data-i18n="buffer-parser.label.multipleResult">multiple results</span>
             </label>
             <label for="node-input-setTopic" style="width:23%">
-                <input type="checkbox" id="node-input-setTopic" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.setTopic">set topic</span>
+                <input type="checkbox" id="node-input-setTopic" style="display:inline-block; width:22px; vertical-align:baseline;" title="Use the items name as the topic for the item, otherwise the incoming msg.topic will be used" autocomplete="off"><span data-i18n="buffer-parser.label.setTopic">set topic</span>
             </label>
             <label for="node-input-fanOutMultipleResult" style="width:23%">
-                <input type="checkbox" id="node-input-fanOutMultipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" autocomplete="off"><span data-i18n="buffer-parser.label.fanOut">fan out</span>
+                <input type="checkbox" id="node-input-fanOutMultipleResult" style="display:inline-block; width:22px; vertical-align:baseline;" title="Send each item out of a separate node output" autocomplete="off"><span data-i18n="buffer-parser.label.fanOut">fan out</span>
             </label>
             <input type="hidden" id="node-input-outputs"/>
         </span>
