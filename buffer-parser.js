@@ -138,24 +138,30 @@ module.exports = function (RED) {
             }
 
             //compile scaler
-            
-            if(formattedSpecItem.scale && formattedSpecItem.scale != 1) {
+            var scale = formattedSpecItem.scale && formattedSpecItem.scale.trim();
+            if (scale) {
                 try {
                     var scale = formattedSpecItem.scale.trim();
-                    formattedSpecItem.scaler = {
-                        operator: '*',
-                        operand: Number(scale)
-                    }
-                    if(scale == "!" || scale == "!!") scale += "0"
-                    const matches = scale.matchAll(scalerRegex);
-                    for (const match of matches) {
-                        formattedSpecItem.scaler = {
-                            operator: match["1"].trim(),
-                            operand: Number(match["2"])
+                    if (scale != "1" && scale != "0") {
+                        if (isNumber(scale)) {
+                            formattedSpecItem.scaler = { operator: '*', operand: Number(scale) };
+                        } else {
+                            if (scale == "!" || scale == "!!") scale += "0"
+                            const matches = scale.matchAll(scalerRegex);
+                            for (const match of matches) {
+                                formattedSpecItem.scaler = {
+                                    operator: match["1"].trim(),
+                                    operand: Number(match["2"])
+                                }
+                                break;
+                            }      
+                            if (!formattedSpecItem.scaler || !formattedSpecItem.scaler.operator || !scalingOps[formattedSpecItem.scaler.operator] || !isNumber(formattedSpecItem.scaler.operand)) {
+                                throw new Error("scaling equation '" + formattedSpecItem.scale + "' is not valid (item " + itemNumber + " '" + (formattedSpecItem.name || "unnamed") + "')");
+                            }
                         }
-                        break;
                     }
                 } catch (e) {
+                    throw e
                 }
             }
 
@@ -363,12 +369,15 @@ module.exports = function (RED) {
                     let val = fn(bufPos);//call specified function on the buffer
                     if (_mask) val = (val & _mask);
                     // if (scale && scale != 1) val = val * scale;
-                    if(scaler) {
-                        if (scaler.operator) {
-                            if (scalingOps[scaler.operator]) val = scalingOps[scaler.operator](val, scaler.operand);
-                        } else if (scaler.operand && scaler.operand !== 1) {
-                            val = val * scaler.operand; //multiplier
-                        }
+                    // if(scaler) {
+                    //     if (scaler.operator) {
+                    //         if (scalingOps[scaler.operator]) val = scalingOps[scaler.operator](val, scaler.operand);
+                    //     } else if (scaler.operand && scaler.operand !== 1) {
+                    //         val = val * scaler.operand; //multiplier
+                    //     }
+                    // }
+                    if(scaler && scaler.operator && scalingOps[scaler.operator]) {
+                        val = scalingOps[scaler.operator](val, scaler.operand);
                     }
                     if (dataCount > 1) {
                         value.push(val);
