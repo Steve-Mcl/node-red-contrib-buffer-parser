@@ -33,24 +33,43 @@ copies or substantial portions of the Software.
         'boolean': 'bool'
     }
     function describeItem (item, index) {
-        var t = "Item " + (index+1) + ": '" + item.name + "' {" + item.type + "}" 
-        if (item.offset) t += ", offset " + item.offset;
-        if (item.offsetbit) t += ", offsetbit " + item.offsetbit;
-        if (item.scale && item.scale != "0" && item.scale != "1") t += ", scale " + item.scale;
-        if (item.length) t += ", length " + item.length;
-        return t;
+        return item ? item.name + " {" + item.type + "}" : "";
     }
     function describeConfig(node) {
         var uiSpec = node.specificationType == "ui";
-        if(!uiSpec) return "Dynamic";
+        if(!uiSpec) return "<dynamic>";
+        if(node.resultType == "buffer") return "Buffer";
         var itemCount = (node && node.items) ? node.items.length : 0;
-        var t = "Output: ";
+        if(!itemCount) return "No items specified!";
+        var t = "";
         if(node.multipleResult) {
-            t += itemCount + (itemCount = 1 ? " item" : " items") 
+            switch (node.resultType) {
+                case "value":
+                    t = itemCount + (itemCount == 1 ? " value" : " values") 
+                    break;
+                case "object":
+                    t = itemCount + (itemCount == 1 ? " object" : " objects") 
+                    break;
+            }
             if(node.setTopic) 
-                t += " (with topic set to item name)";
+                t += " (name as topic)";
+            else 
+                t += " (original msg topic)";
         } else {
-            t += node.resultType + " with " + itemCount + (itemCount == 1 ? " property" : " properties") 
+            switch (node.resultType) {
+                case "value":
+                    t = "Array containing " + itemCount + (itemCount == 1 ? " value" : " values");
+                    break;
+                case "array":
+                    t = "Array containing " + itemCount + (itemCount == 1 ? " object" : " objects");
+                    break;
+                case "keyvalue":
+                    t = "Object containing " + itemCount + (itemCount == 1 ? " key/value property" : " key/value properties");
+                    break;
+                case "keyobject":
+                    t = "Object containing " + itemCount + (itemCount == 1 ? " key/object property" : " key/object properties");
+                    break;
+            }
         }
         return t;
     }
@@ -136,8 +155,9 @@ copies or substantial portions of the Software.
         outputLabels: function(index) {
             var node = this;
             var item = node.items && node.items[index];
-            if (item) {
-                if(node.multipleResult && node.fanOutMultipleResult) return describeItem(item, index);
+            if (item && node.multipleResult && node.fanOutMultipleResult) {
+                return describeItem(item, index); 
+            } else {
                 return describeConfig(node);
             }
         },
