@@ -138,10 +138,17 @@ module.exports = function (RED) {
             }
 
             //compile scaler
-            var scale = formattedSpecItem.scale && formattedSpecItem.scale.trim();
+            let scale = null;
+            if(formattedSpecItem.scale) {
+                if(typeof formattedSpecItem.scale == "number") {
+                    scale = formattedSpecItem.scale.toString();
+                } else {
+                    scale = formattedSpecItem.scale && formattedSpecItem.scale.trim();
+                }
+            }
+            
             if (scale) {
                 try {
-                    var scale = formattedSpecItem.scale.trim();
                     if (scale != "1" && scale != "0") {
                         if (isNumber(scale)) {
                             formattedSpecItem.scaler = { operator: '*', operand: Number(scale) };
