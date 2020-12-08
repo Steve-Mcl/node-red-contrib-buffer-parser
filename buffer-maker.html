@@ -181,34 +181,9 @@ copies or substantial portions of the Software.
                             var byteOffsetMultiplier = 0;
                             var bitOffset = 0;
                             rule.type = prev.type;
-                            if (rule.type.indexOf("8") >= 0) byteOffsetMultiplier = 1;
-                            if (rule.type == "buffer") byteOffsetMultiplier = 1;
-                            if (rule.type == "byte") byteOffsetMultiplier = 1;
-                            if (rule.type == "string") byteOffsetMultiplier = 1;
-                            if (rule.type == "char") byteOffsetMultiplier = 1;
-                            if (rule.type == "ascii") byteOffsetMultiplier = 1;
-                            if (rule.type == "hex") byteOffsetMultiplier = 1;
-                            if (rule.type == "binary") byteOffsetMultiplier = 1;
-                            if (rule.type == "ucs2") byteOffsetMultiplier = 1;
-                            if (rule.type == "latin1") byteOffsetMultiplier = 1;
-                            if (rule.type.indexOf("16") >= 0) byteOffsetMultiplier = 2;
-                            if (rule.type.indexOf("bcd") >= 0) byteOffsetMultiplier = 2;
-                            if (rule.type.indexOf("32") >= 0) byteOffsetMultiplier = 4;
-                            if (rule.type.indexOf("double") >= 0) byteOffsetMultiplier = 4;
-                            if (rule.type.indexOf("float") >= 0) byteOffsetMultiplier = 4;
-                            if (rule.type.indexOf("64") >= 0) byteOffsetMultiplier = 8;
-                            if (rule.type == "bool") bitOffset = prev.length;
-                            if(prev.length > 0) {
-                                var byteOffset = (prev.length * byteOffsetMultiplier);
-                                if (prev.offset != null) rule.offset = prev.offset + byteOffset;
-                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit + bitOffset;
-                            } else {
-                                if (prev.offset != null) rule.offset = prev.offset;
-                                if (prev.offsetbit != null) rule.offsetbit = prev.offsetbit;
-                            }
-                            if (prev.scale != null) rule.scale = prev.scale;
-                            if (prev.length != null) rule.length = prev.length;
-                            if (prev.mask != null) rule.mask = prev.mask;
+                            rule.length = prev.length;
+                            rule.data = prev.data;
+                            rule.dataType = prev.dataType;
                         }
                     }
 
