@@ -370,6 +370,9 @@ module.exports = function (RED) {
                 if (dataCount > 1) {
                     value = [];
                 }
+                if(buffer[bufferFunction] == null) {
+                    throw new Error(`Unknown Buffer method '${bufferFunction}'`);
+                }
                 var fn = buffer[bufferFunction].bind(buffer);
                 for (index = 0; index < dataCount; index++) {
                     let bufPos = startByte + (index * dataSize);
