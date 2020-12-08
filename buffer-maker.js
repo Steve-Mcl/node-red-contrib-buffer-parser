@@ -564,16 +564,6 @@ module.exports = function (RED) {
 
         node.on('input', function (msg) {
             node.status({});//clear status
-            var data;
-            RED.util.evaluateNodeProperty(node.data, node.dataType, node, msg, (err, value) => {
-                if (err) {
-                    node.error("Unable to evaluate data", msg);
-                    node.status({ fill: "red", shape: "ring", text: "Unable to evaluate data" });
-                    return;//halt flow!
-                } else {
-                    data = value;
-                }
-            });
             var specification;
             RED.util.evaluateNodeProperty(node.specification, node.specificationType, node, msg, (err, value) => {
                 if (err) {
