@@ -139,7 +139,7 @@ const TYPEOPTS = [
 ];
 
 /**
- * helper function to dynamically set a nexted property by name
+ * helper function to set a nested property by path
  * @param {*} obj - the object in which to set a properties value
  * @param {string} path - the path to the property e.g. payload.value
  * @param {*} val - the value to set in obj.path
@@ -152,6 +152,20 @@ function setObjectProperty(obj, path, val, sep) {
         obj[key] = obj[key] || {},
         obj);
     lastObj[lastKey] = val;
+}
+
+/**
+ * helper function to get a property by path
+ * @param {*} obj - the object in which to set a properties value
+ * @param {string} path - the path to the property e.g. payload.value
+ * @param {*} [sep] - the path property separator (defaults to `.`)
+ */
+function getObjectProperty(obj, path, sep) {
+    sep = sep == null ? "." : sep;
+    for (var i=0, path=path.split(sep), len=path.length; i<len; i++){
+        obj = obj[path[i]];
+    };
+    return obj;
 }
 
 function isNumber(n) {
@@ -169,7 +183,8 @@ exports.getBit = getBit;
 exports.setBit = setBit;
 exports.clearBit = clearBit;
 exports.updateBit = updateBit;
-exports.setObjectProperty = setObjectProperty;
 exports.isNumber = isNumber;
+exports.setObjectProperty = setObjectProperty;
+exports.getObjectProperty = getObjectProperty;
 exports.SWAPOPTS = SWAPOPTS;
 exports.TYPEOPTS = TYPEOPTS;
