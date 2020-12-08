@@ -151,6 +151,7 @@ module.exports = function (RED) {
                 specification: validatedSpec
             }
             let bufferExpectedLength = 0;
+            const itemCount = validatedSpec.items.length;
             /** @type Buffer */ var buf = Buffer.alloc(0);
 
             //#region Helper function ......................................................
