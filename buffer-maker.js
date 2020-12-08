@@ -164,8 +164,8 @@ module.exports = function (RED) {
              * @param {Function} [dataConversion] the conversion function to execute
              */
             function itemReader(item, bufferFunction, dataSize, dataConversion) {
-                var b = dataToBuffer(item.value, item.length, bufferFunction, dataSize, dataConversion);
-                let expectedLength = item.length * dataSize;
+                const b = dataToBuffer(item.value, item.length, bufferFunction, dataSize, dataConversion);
+                const expectedLength = item.length * dataSize;
                 if (!b) throw new Error(`Data item ${item.name} converted data is empty`);
                 if (b.length != expectedLength) throw new Error(`Data item ${item.name} converted byte length error. Expected ${expectedLength}, got ${b.length != expectedLength}`);
                 return b;
@@ -173,12 +173,12 @@ module.exports = function (RED) {
 
             //helper function to return 1 or more correctly formatted values from the buffer
             function dataToBuffer(data, dataCount, bufferFunction, dataSize, dataConversion) {
-                let siz = dataSize * dataCount;
+                const siz = dataSize * dataCount;
                 let buf = Buffer.alloc(siz);
                 if (buf[bufferFunction] == null) {
                     throw new Error(`Unknown Buffer method '${bufferFunction}'`);
                 }
-                var fn = buf[bufferFunction].bind(buf);
+                let fn = buf[bufferFunction].bind(buf);
                 if (!Array.isArray(data)) data = [data];
                 for (let index = 0; index < dataCount; index++) {
                     let bufPos = (index * dataSize);
@@ -200,12 +200,13 @@ module.exports = function (RED) {
 
             for (var itemIndex = 0; itemIndex < itemCount; itemIndex++) {
                 let item = validatedSpec.items[itemIndex];
+                let itemDesc = item.name || ("item " + (itemIndex + 1));
                 let type = item.type;
                 let length = item.length || item.bytes || 1;
                 let data = null;
                 RED.util.evaluateNodeProperty(item.data, item.dataType, node, msg, (err, value) => {
                     if (err) {
-                        node.error("Unable to evaluate data of item " + itemIndex + 1 + " named '" + item.name + "'", msg);
+                        node.error("Unable to evaluate data of '" + itemDesc + "'", msg);
                         node.status({ fill: "red", shape: "ring", text: "Unable to evaluate data" });
                         return;//halt flow!
                     } else {
@@ -217,8 +218,8 @@ module.exports = function (RED) {
                     case 'int':
                     case 'int8':
                         {
-                            var dataSize = 1;
-                            var b = itemReader(item, "writeInt8", dataSize);
+                            const dataSize = 1;
+                            const b = itemReader(item, "writeInt8", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -227,8 +228,8 @@ module.exports = function (RED) {
                     case 'uint8':
                     case 'byte':
                         {
-                            var dataSize = 1;
-                            var b = itemReader(item, "writeUInt8", dataSize);
+                            const dataSize = 1;
+                            const b = itemReader(item, "writeUInt8", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -236,8 +237,8 @@ module.exports = function (RED) {
 
                     case 'int16le':
                         {
-                            var dataSize = 2;
-                            var b = itemReader(item, "writeInt16LE", dataSize);
+                            const dataSize = 2;
+                            const b = itemReader(item, "writeInt16LE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -246,8 +247,8 @@ module.exports = function (RED) {
                     case 'int16':
                     case 'int16be':
                         {
-                            var dataSize = 2;
-                            var b = itemReader(item, "writeInt16BE", dataSize);
+                            const dataSize = 2;
+                            const b = itemReader(item, "writeInt16BE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -255,8 +256,8 @@ module.exports = function (RED) {
 
                     case 'uint16le':
                         {
-                            var dataSize = 2;
-                            var b = itemReader(item, "writeUInt16LE", dataSize);
+                            const dataSize = 2;
+                            const b = itemReader(item, "writeUInt16LE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -265,8 +266,8 @@ module.exports = function (RED) {
                     case 'uint16':
                     case 'uint16be':
                         {
-                            var dataSize = 2;
-                            var b = itemReader(item, "writeUInt16BE", dataSize);
+                            const dataSize = 2;
+                            const b = itemReader(item, "writeUInt16BE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -274,8 +275,8 @@ module.exports = function (RED) {
 
                     case 'int32le':
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeInt32LE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeInt32LE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -284,8 +285,8 @@ module.exports = function (RED) {
                     case 'int32':
                     case 'int32be':
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeInt32BE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeInt32BE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -293,8 +294,8 @@ module.exports = function (RED) {
 
                     case 'uint32le':
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeUInt32LE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeUInt32LE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -302,8 +303,8 @@ module.exports = function (RED) {
                     case 'uint32':
                     case 'uint32be':
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeUInt32BE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeUInt32BE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -311,8 +312,8 @@ module.exports = function (RED) {
 
                     case 'bigint64le':
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeBigInt64LE", dataSize, toBigint);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeBigInt64LE", dataSize, toBigint);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -321,8 +322,8 @@ module.exports = function (RED) {
                     case 'bigint64':
                     case 'bigint64be':
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeBigInt64BE", dataSize, toBigint);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeBigInt64BE", dataSize, toBigint);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -330,8 +331,8 @@ module.exports = function (RED) {
 
                     case 'biguint64le':
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeBigUInt64LE", dataSize, toBigint);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeBigUInt64LE", dataSize, toBigint);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -339,8 +340,8 @@ module.exports = function (RED) {
                     case 'biguint64':
                     case 'biguint64be':
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeBigUInt64BE", dataSize, toBigint);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeBigUInt64BE", dataSize, toBigint);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -348,8 +349,8 @@ module.exports = function (RED) {
 
                     case 'floatle': //Reads a 32-bit float from buf at the specified offset
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeFloatLE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeFloatLE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -357,8 +358,8 @@ module.exports = function (RED) {
                     case 'float': //Reads a 32-bit float from buf at the specified offset
                     case 'floatbe': //Reads a 32-bit float from buf at the specified offset
                         {
-                            var dataSize = 4;
-                            var b = itemReader(item, "writeFloatBE", dataSize);
+                            const dataSize = 4;
+                            const b = itemReader(item, "writeFloatBE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -366,8 +367,8 @@ module.exports = function (RED) {
 
                     case 'doublele': //Reads a 64-bit double from buf at the specified offset
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeDoubleLE", dataSize);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeDoubleLE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
@@ -376,15 +377,15 @@ module.exports = function (RED) {
                     case 'double': //Reads a 64-bit double from buf at the specified offset
                     case 'doublebe': //Reads a 64-bit double from buf at the specified offset
                         {
-                            var dataSize = 8;
-                            var b = itemReader(item, "writeDoubleBE", dataSize);
+                            const dataSize = 8;
+                            const b = itemReader(item, "writeDoubleBE", dataSize);
                             bufferExpectedLength += (item.length * dataSize);
                             buf = appendBuffer(buf, b);
                         }
                         break
 
                     case 'string':// supported: 'ascii', 'utf8', 'utf16le', 'ucs2', 'latin1', and 'binary'.
-                        type = "ascii"
+                        type = "ascii";
                     case 'ascii':
                     case 'hex':
                     case 'utf8':
@@ -416,7 +417,7 @@ module.exports = function (RED) {
                                 _byteCount = Math.floor(length / 8) + ((length % 8) > 0 ? 1 : 0)
                             }
                             bufferExpectedLength += (_byteCount);
-                            let b = Buffer.alloc(_byteCount);
+                            const b = Buffer.alloc(_byteCount);
                             for (let index = 0; index < _byteCount; index++) {
                                 const offs = index * 8;
                                 const bits = item.value.slice(offs, 8);
@@ -436,7 +437,7 @@ module.exports = function (RED) {
                                 _byteCount = length;
                             }
                             bufferExpectedLength += (_byteCount);
-                            let b = Buffer.alloc(_byteCount);
+                            const b = Buffer.alloc(_byteCount);
                             for (let index = 0; index < _byteCount; index++) {
                                 const bits = item.value[index];
                                 const bval = bitsToByte(bits);
@@ -460,7 +461,7 @@ module.exports = function (RED) {
                                 _len = length;
                             }
                             bufferExpectedLength += _byteCount;
-                            let b = Buffer.alloc(_byteCount);
+                            const b = Buffer.alloc(_byteCount);
                             let fn = type == "16bitle" ? b.writeUInt16LE.bind(b) : b.writeUInt16BE.bind(b);
                             for (let index = 0; index < _len; index++) {
                                 const bits = item.value[index];
@@ -489,7 +490,7 @@ module.exports = function (RED) {
                             data = data.slice(0, _len);
                             bufferExpectedLength += _byteCount;
                             dataBCD = data.map(e => number2bcd(e));
-                            let b = Buffer.alloc(_byteCount);
+                            const b = Buffer.alloc(_byteCount);
                             let fn = type === "bcdle" ? b.writeUInt16LE.bind(b) : b.writeUInt16BE.bind(b);
                             for (let index = 0; index < _len; index++) {
                                 fn(dataBCD[index], index * 2);
@@ -499,14 +500,15 @@ module.exports = function (RED) {
                         break;
                     case "buffer":
                         {
-                            let _end = length === -1 ? undefined : length;
+                            const _end = length === -1 ? undefined : length;
+                            if (!(item.value instanceof Buffer)) throw new Error(`Expected value of '${itemDesc}' to be a Buffer`)
+                            const b = item.value.slice(0, _end);
                             bufferExpectedLength += length;
-                            let b = buf.slice(0, _end);
                             buf = appendBuffer(buf, b);
                         }
                         break;
                     default: {
-                        let errmsg = `type '${item.type}' is not a recognised parse specification`;
+                        const errmsg = `type '${item.type}' specified in '${itemDesc}' is not a recognised spec type`;
                         console.warn(errmsg);
                         throw new Error(errmsg);
                         break;
@@ -564,7 +566,7 @@ module.exports = function (RED) {
 
         node.on('input', function (msg) {
             node.status({});//clear status
-            var specification;
+            let specification;
             RED.util.evaluateNodeProperty(node.specification, node.specificationType, node, msg, (err, value) => {
                 if (err) {
                     node.error("Unable to evaluate specification", msg);
