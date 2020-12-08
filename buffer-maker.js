@@ -177,6 +177,9 @@ module.exports = function (RED) {
             function dataToBuffer(data, dataCount, bufferFunction, dataSize, dataConversion) {
                 let siz = dataSize * dataCount;
                 let buf = Buffer.alloc(siz);
+                if (buf[bufferFunction] == null) {
+                    throw new Error(`Unknown Buffer method '${bufferFunction}'`);
+                }
                 var fn = buf[bufferFunction].bind(buf);
                 if(!Array.isArray(data)) data = [data];
                 for (let index = 0; index < dataCount; index++) {
