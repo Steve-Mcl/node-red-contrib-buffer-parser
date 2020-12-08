@@ -21,8 +21,6 @@ module.exports = function (RED) {
     function bufferMakerNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        node.data = config.data || "";//data
-        node.dataType = config.dataType || "msg";
         node.specification = config.specification || "";//specification
         node.specificationType = config.specificationType || "ui";
 
@@ -147,8 +145,7 @@ module.exports = function (RED) {
          * @param {object} specification - an object with `{options:{byteSwap: boolean}}` and `{items[ {name: string, offset: number, length: number, type: string} ]}` 
          * @returns result object containing . `buffer:{}`, `intArray[]`, `uintArray[]`
          */
-        function maker(data, validatedSpec, msg) {
-
+        function maker(validatedSpec, msg) {
             let result = {
                 /** @type Buffer */buffer: null,
                 specification: validatedSpec
@@ -666,7 +663,7 @@ module.exports = function (RED) {
             msg.originalPayload = msg.payload;//store original Payload incase user still wants it
             try {
 
-                let results = maker(data, validatedSpec, msg);
+                let results = maker(validatedSpec, msg);
                 if (validatedSpec.options.singleResult !== false) {
                     msg.specification = results.specification;
                     setObjectProperty(msg, validatedSpec.options.msgProperty, results.buffer, ".")

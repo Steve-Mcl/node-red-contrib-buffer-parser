@@ -86,11 +86,8 @@ copies or substantial portions of the Software.
         color: '#0090d4',
         defaults: {
             name: { value: "" },
-            data: { value: "payload", validate: RED.validators.typedInput("dataType") },
-            dataType: { value: "msg" },
             specification: { value: "" },
             specificationType: { value: "ui" },
-
             items: { value: [{ name: "item1", type: "int16be", data: "payload", dataType: "msg" }], required: true },
             swap1: { value: "" },
             swap2: { value: "" },
@@ -338,11 +335,6 @@ copies or substantial portions of the Software.
     <div class="form-row buffer-maker-form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row buffer-maker-form-row">
-        <label for="node-input-data"><i class="fa fa-ellipsis-h"></i><span data-i18n="buffer-maker.label.data"> Property</span></label>
-        <input type="hidden" id="node-input-dataType">
-        <input style="width: 70%" type="text" id="node-input-data" placeholder="">
     </div>
     <div class="form-row buffer-maker-form-row">
         <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-maker.label.specification"> Specification</span></label>
