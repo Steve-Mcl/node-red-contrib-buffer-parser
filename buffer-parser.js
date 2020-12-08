@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 
 module.exports = function (RED) {
     const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
-    const { setObjectProperty, bcd2number, byteToBits, wordToBits, isNumber,TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
+    const { setObjectProperty, bcd2number, byteToBits, wordToBits, isNumber, TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
     const scalingOps = {
         ">": (v, o) => v > o,
         "<": (v, o) => v < o,
@@ -139,14 +139,14 @@ module.exports = function (RED) {
 
             //compile scaler
             let scale = null;
-            if(formattedSpecItem.scale) {
-                if(typeof formattedSpecItem.scale == "number") {
+            if (formattedSpecItem.scale) {
+                if (typeof formattedSpecItem.scale == "number") {
                     scale = formattedSpecItem.scale.toString();
                 } else {
                     scale = formattedSpecItem.scale && formattedSpecItem.scale.trim();
                 }
             }
-            
+
             if (scale) {
                 try {
                     if (scale != "1" && scale != "0") {
@@ -161,7 +161,7 @@ module.exports = function (RED) {
                                     operand: Number(match["2"])
                                 }
                                 break;
-                            }      
+                            }
                             if (!formattedSpecItem.scaler || !formattedSpecItem.scaler.operator || !scalingOps[formattedSpecItem.scaler.operator] || !isNumber(formattedSpecItem.scaler.operand)) {
                                 throw new Error("scaling equation '" + formattedSpecItem.scale + "' is not valid (item " + itemNumber + " '" + (formattedSpecItem.name || "unnamed") + "')");
                             }
@@ -171,17 +171,6 @@ module.exports = function (RED) {
                     throw e
                 }
             }
-
-
-            // //ensure scale is something
-            // if (formattedSpecItem.scale == null || formattedSpecItem.scale == undefined) {
-            //     formattedSpecItem.scale = 0;
-            // }
-            // if (isNumber(formattedSpecItem.scale)) {
-            //     formattedSpecItem.scale = Number(formattedSpecItem.scale);
-            // } else {
-            //     throw new Error("scale is not a number (item '" + (formattedSpecItem.name || "unnamed") + "')");
-            // }
 
             return formattedSpecItem;
         }
@@ -370,7 +359,7 @@ module.exports = function (RED) {
                 if (dataCount > 1) {
                     value = [];
                 }
-                if(buffer[bufferFunction] == null) {
+                if (buffer[bufferFunction] == null) {
                     throw new Error(`Unknown Buffer method '${bufferFunction}'`);
                 }
                 var fn = buffer[bufferFunction].bind(buffer);
@@ -378,15 +367,7 @@ module.exports = function (RED) {
                     let bufPos = startByte + (index * dataSize);
                     let val = fn(bufPos);//call specified function on the buffer
                     if (_mask) val = (val & _mask);
-                    // if (scale && scale != 1) val = val * scale;
-                    // if(scaler) {
-                    //     if (scaler.operator) {
-                    //         if (scalingOps[scaler.operator]) val = scalingOps[scaler.operator](val, scaler.operand);
-                    //     } else if (scaler.operand && scaler.operand !== 1) {
-                    //         val = val * scaler.operand; //multiplier
-                    //     }
-                    // }
-                    if(scaler && scaler.operator && scalingOps[scaler.operator]) {
+                    if (scaler && scaler.operator && scalingOps[scaler.operator]) {
                         val = scalingOps[scaler.operator](val, scaler.operand);
                     }
                     if (dataCount > 1) {
@@ -416,7 +397,6 @@ module.exports = function (RED) {
                 switch (type.toLowerCase()) {
                     case 'int':
                     case 'int8':
-                        //result[spec] = buf.readInt8(offset);
                         itemReader(item, buf, "readInt8", 1);
                         break;
                     case 'uint':
@@ -502,23 +482,21 @@ module.exports = function (RED) {
                     case "utf16le":
                     case "ucs2":
                     case "latin1":
-                    case "binary": 
+                    case "binary":
                         {
-                            let _end =  length === -1 ? undefined : offset + length;
+                            let _end = length === -1 ? undefined : offset + length;
                             item.value = buf.toString(type, offset, _end);
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
                         break;
                     case "bool":
-                    case "boolean": 
+                    case "boolean":
                         {
                             let _byteCount;
-                            if(length === -1) {
+                            if (length === -1) {
                                 _byteCount = -1
                             } else {
                                 _byteCount = Math.floor(((item.offsetbit + length) / 8)) + (((item.offsetbit + length) % 8) > 0 ? 1 : 0)
@@ -536,14 +514,12 @@ module.exports = function (RED) {
                             }
                             if (length === 1) {
                                 item.value = bitData[item.offsetbit];
-                            } else if(length === -1) {
+                            } else if (length === -1) {
                                 item.value = bitData.slice(item.offsetbit); // -1 - return all to the end.
                             } else {
                                 item.value = bitData.slice(item.offsetbit, item.offsetbit + length);
                             }
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
@@ -562,9 +538,7 @@ module.exports = function (RED) {
                                 bitData.push(bits);
                             }
                             item.value = bitData;
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
@@ -586,9 +560,7 @@ module.exports = function (RED) {
                                 bitData.push(bits);
                             }
                             item.value = bitData;
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
@@ -606,21 +578,17 @@ module.exports = function (RED) {
                                 dataBCD = bcd2number(data)
                             }
                             item.value = dataBCD;
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
                         }
                         break;
-                    case "buffer": 
+                    case "buffer":
                         {
-                            let _end =  length === -1 ? undefined : offset + length;
+                            let _end = length === -1 ? undefined : offset + length;
                             item.value = buf.slice(offset, _end);
-                            // result.objectResults[item.name] = item;
                             setObjectProperty(result.objectResults, item.name, item, "=>", "=>");
-                            // result.keyvalues[item.name] = item.value;
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>", "=>");
                             result.arrayResults.push(item);
                             result.values.push(item.value);
@@ -639,24 +607,21 @@ module.exports = function (RED) {
                     switch (validatedSpec.options.resultType) {
                         case "value":
                         case "keyvalue":
-                            // RED.util.setObjectProperty(m,validatedSpec.options.msgProperty, item.value);
                             setObjectProperty(m, validatedSpec.options.msgProperty, item.value, ".")
                             break;
-                            case "object":
-                            // RED.util.setObjectProperty(m,validatedSpec.options.msgProperty, item);
+                        case "object":
                             setObjectProperty(m, validatedSpec.options.msgProperty, item, ".")
                             break;
                     }
-                    if(node.fanOutMultipleResult) {
+                    if (node.fanOutMultipleResult) {
                         fanOut[itemIndex] = m;
-                        //node.send(ms);
                     } else {
                         node.send(m);
                     }
-                    
+
                 }
             }
-            if(node.fanOutMultipleResult) {
+            if (node.fanOutMultipleResult) {
                 return fanOut;
             }
             return result;
@@ -737,15 +702,6 @@ module.exports = function (RED) {
                     }
                 });
                 var msgProperty = node.msgProperty;
-                // RED.util.evaluateNodeProperty(node.msgProperty,"str" node.msgPropertyType,node,msg,(err,value) => {
-                //     if (err) {
-                //         node.error("Unable to evaluate msgProperty",msg);
-                //         node.status({fill:"red",shape:"ring",text:"Unable to evaluate msgProperty"});
-                //         return;//halt flow!
-                //     } else {
-                //         msgProperty = value;
-                //     }
-                // }); 
 
                 var swap = [];
                 if (Array.isArray(swap1)) {
@@ -783,7 +739,7 @@ module.exports = function (RED) {
                 return;//halt flow
             }
 
-            msg.originalPayload = msg.payload;//store original Payload incase user still wants it
+            msg.originalPayload = msg.payload;//store original Payload in case user still wants it
             try {
 
                 let results = parser(data, validatedSpec, msg);
@@ -797,29 +753,24 @@ module.exports = function (RED) {
 
                     switch (validatedSpec.options.resultType) {
                         case "buffer":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer, ".")
-                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.buffer, ".");
                             break;
                         case "value":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values, ".")
-                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.values, ".");
                             break;
                         case "object":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults, ".")
-                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.objectResults, ".");
                             break;
                         case "keyvalue":
                         case "keyvalues":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues, ".")
-                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.keyvalues, ".");
                             break;
                         case "array":
-                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults, ".")
-                            // RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults)
+                            setObjectProperty(msg, validatedSpec.options.msgProperty, msg.arrayResults, ".");
                             break;
                     }
                     node.send(msg);
-                } else if(node.fanOutMultipleResult) {
+                } else if (node.fanOutMultipleResult) {
                     node.send(results);
                 }
 
@@ -828,8 +779,6 @@ module.exports = function (RED) {
                 node.status({ fill: "red", shape: "dot", text: "Error parsing data" });
                 return;//halt flow
             }
-
-
         });
     }
     RED.nodes.registerType("buffer-parser", bufferParserNode);
