@@ -191,11 +191,10 @@ module.exports = function (RED) {
                 return buf;
             }
 
-            result.buffer = buf;
-
-
-            var itemCount = validatedSpec.items.length;
-            var toBigint = e => BigInt(e);//a data convertor to handle implicit int ot big int converions (otherwise buffer throws error)
+            /** Convert string or integer to bigint */
+            function toBigint(e) {
+                return BigInt(e);//a data convertor to handle implicit int ot big int conversions (otherwise buffer throws error)
+            }
             function appendBuffer(dst, buf) {
                 return Buffer.concat([dst, buf]);
             }
