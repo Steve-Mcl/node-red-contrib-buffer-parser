@@ -150,7 +150,7 @@ module.exports = function (RED) {
                 /** @type Buffer */buffer: null,
                 specification: validatedSpec
             }
-            var bufferExpectedLength = 0;
+            let bufferExpectedLength = 0;
             /** @type Buffer */ var buf = Buffer.alloc(0);
 
             //#region Helper function ......................................................
