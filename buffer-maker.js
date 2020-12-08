@@ -198,12 +198,20 @@ module.exports = function (RED) {
             }
             //#endregion 
 
+            const options = {
+                lengthMultiplier: {
+                    "hex": 0.5,
+                    "utf16le": 2
+                },
+                lengthMod: {
+                    "hex": 2
+                }
+            }
             for (var itemIndex = 0; itemIndex < itemCount; itemIndex++) {
                 let item = validatedSpec.items[itemIndex];
                 let itemDesc = item.name || ("item " + (itemIndex + 1));
                 let type = item.type;
                 let length = item.length || item.bytes || 1;
-                let data = null;
                 RED.util.evaluateNodeProperty(item.data, item.dataType, node, msg, (err, value) => {
                     if (err) {
                         node.error("Unable to evaluate data of '" + itemDesc + "'", msg);
@@ -395,14 +403,23 @@ module.exports = function (RED) {
                     case "latin1":
                     case "binary":
                         {
-                            var dataSize = 1;
-                            let _end = length === -1 ? undefined : length;
-                            let _length = _end || item.value.length;
-                            // bufferExpectedLength += _length;
-                            if (item.value.length < _length) throw (`data for item named ${item.name} is shorter than required length`);
-                            let v = item.value.slice(0, _end);
-                            let b = Buffer.from(v, type);
-                            bufferExpectedLength += b.length;
+                            const dataSize = 1;
+                            const _end = length === -1 ? undefined : length;
+                            const _length = _end || item.value.length;
+                            const lengthMod = options.lengthMod[type.toLowerCase()];
+                            if (lengthMod) {
+                                let m = _length % lengthMod;
+                                if (m) throw new Error(`Length of '${itemDesc}' should be divisible by ${lengthMod}`);
+                            }
+                            const lengthMultiplier = options.lengthMultiplier[type.toLowerCase()];
+                            if (lengthMultiplier != null) {
+                                bufferExpectedLength += (_length * lengthMultiplier);
+                            } else {
+                                bufferExpectedLength += _length;
+                            }
+                            if (item.value.length < _length) throw new Error(`data for '${itemDesc}' is shorter than required length`);
+                            const v = item.value.slice(0, _end);
+                            const b = Buffer.from(v, type);
                             buf = appendBuffer(buf, b);
                         }
                         break;
