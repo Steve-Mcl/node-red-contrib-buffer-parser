@@ -486,6 +486,9 @@ module.exports = function (RED) {
                         {
                             let _end = length === -1 ? undefined : offset + length;
                             item.value = buf.toString(type, offset, _end);
+                            if(type=="ascii"||type=="utf8"||type=="utf-8"||type=="latin1") {
+                                item.value = item.value.substr(0, item.value.indexOf('\0'));
+                            }
                             setObjectProperty(result.objectResults, item.name, item, "=>");
                             setObjectProperty(result.keyvalues, item.name, item.value, "=>");
                             result.arrayResults.push(item);

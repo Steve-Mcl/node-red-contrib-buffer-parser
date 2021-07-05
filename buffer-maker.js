@@ -405,7 +405,8 @@ module.exports = function (RED) {
                         {
                             const dataSize = 1;
                             const _end = length === -1 ? undefined : length;
-                            const _length = _end || item.value.length;
+                            let itemValue = item.value;
+                            const _length = _end || itemValue.length;
                             const lengthMod = options.lengthMod[type.toLowerCase()];
                             if (lengthMod) {
                                 let m = _length % lengthMod;
@@ -417,8 +418,16 @@ module.exports = function (RED) {
                             } else {
                                 bufferExpectedLength += _length;
                             }
-                            if (item.value.length < _length) throw new Error(`data for '${itemDesc}' is shorter than required length`);
-                            const v = item.value.slice(0, _end);
+                            if (itemValue.length < _length) {
+                                if(type=="ascii"||type=="utf8"||type=="utf-8"||type=="latin1") {
+                                    itemValue += "\0".repeat(_length-itemValue.length);//pad nulls to string
+                                } else if(type=="utf16le"||type=="ucs2") {
+                                    itemValue += "\0\0".repeat(_length-itemValue.length);//pad nulls to string
+                                } else {
+                                    throw new Error(`data for '${itemDesc}' is shorter than required length`);
+                                }
+                            }
+                            const v = itemValue.slice(0, _end);
                             const b = Buffer.from(v, type);
                             buf = appendBuffer(buf, b);
                         }
