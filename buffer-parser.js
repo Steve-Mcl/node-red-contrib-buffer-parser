@@ -154,7 +154,17 @@ module.exports = function (RED) {
                             formattedSpecItem.scaler = { operator: '*', operand: Number(scale) };
                         } else {
                             if (scale == "!" || scale == "!!") scale += "0"
-                            const matches = scale.matchAll(scalerRegex);
+                            let matches = [];
+                            if(!scale.matchAll) {
+                                //throw new Error("Scaling equations not supported by the running version of node-js. It is recommended you upgrade nodejs to V12 or greater. Alternatively, do your own scaling on the output.")
+                                //TEMP: emulate matchAll
+                                while ((match = scalerRegex.exec(scale)) !== null) {
+                                    matches.push([...match])
+                                    break;
+                                }
+                            } else {
+                                matches = scale.matchAll(scalerRegex);
+                            }
                             for (const match of matches) {
                                 formattedSpecItem.scaler = {
                                     operator: match["1"].trim(),
