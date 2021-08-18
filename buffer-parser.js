@@ -383,7 +383,7 @@ module.exports = function (RED) {
 
 
             result.buffer = buf;
-            if (validatedSpec.resultType === "buffer") {
+            if (validatedSpec.options.resultType === "buffer") {
                 return result;
             }
 
