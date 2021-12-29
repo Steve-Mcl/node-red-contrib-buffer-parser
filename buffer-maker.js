@@ -164,11 +164,17 @@ module.exports = function (RED) {
              * @param {Function} [dataConversion] the conversion function to execute
              */
             function itemReader(item, bufferFunction, dataSize, dataConversion) {
-                const b = dataToBuffer(item.value, item.length, bufferFunction, dataSize, dataConversion);
-                const expectedLength = item.length * dataSize;
+                const data = Array.isArray(item.value) ? item.value : [item.value];
+                const dataCount = item.length === -1 ? data.length : item.length;
+                const b = dataToBuffer(data, dataCount, bufferFunction, dataSize, dataConversion);
+                const expectedLength = dataCount * dataSize;
                 if (!b) throw new Error(`Data item ${item.name} converted data is empty`);
                 if (b.length != expectedLength) throw new Error(`Data item ${item.name} converted byte length error. Expected ${expectedLength}, got ${b.length != expectedLength}`);
-                return b;
+                return {
+                    buffer: b,
+                    dataCount: dataCount,
+                    dataSize: dataSize
+                };
             }
 
             //helper function to return 1 or more correctly formatted values from the buffer
@@ -227,9 +233,9 @@ module.exports = function (RED) {
                     case 'int8':
                         {
                             const dataSize = 1;
-                            const b = itemReader(item, "writeInt8", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeInt8", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
                     case 'uint':
@@ -237,18 +243,18 @@ module.exports = function (RED) {
                     case 'byte':
                         {
                             const dataSize = 1;
-                            const b = itemReader(item, "writeUInt8", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeUInt8", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'int16le':
                         {
                             const dataSize = 2;
-                            const b = itemReader(item, "writeInt16LE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeInt16LE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
@@ -256,18 +262,18 @@ module.exports = function (RED) {
                     case 'int16be':
                         {
                             const dataSize = 2;
-                            const b = itemReader(item, "writeInt16BE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeInt16BE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'uint16le':
                         {
                             const dataSize = 2;
-                            const b = itemReader(item, "writeUInt16LE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeUInt16LE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
@@ -275,18 +281,18 @@ module.exports = function (RED) {
                     case 'uint16be':
                         {
                             const dataSize = 2;
-                            const b = itemReader(item, "writeUInt16BE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeUInt16BE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'int32le':
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeInt32LE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeInt32LE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
@@ -294,36 +300,36 @@ module.exports = function (RED) {
                     case 'int32be':
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeInt32BE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeInt32BE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'uint32le':
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeUInt32LE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeUInt32LE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
                     case 'uint32':
                     case 'uint32be':
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeUInt32BE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeUInt32BE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'bigint64le':
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeBigInt64LE", dataSize, toBigint);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeBigInt64LE", dataSize, toBigint);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
@@ -331,54 +337,54 @@ module.exports = function (RED) {
                     case 'bigint64be':
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeBigInt64BE", dataSize, toBigint);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeBigInt64BE", dataSize, toBigint);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'biguint64le':
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeBigUInt64LE", dataSize, toBigint);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeBigUInt64LE", dataSize, toBigint);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
                     case 'biguint64':
                     case 'biguint64be':
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeBigUInt64BE", dataSize, toBigint);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeBigUInt64BE", dataSize, toBigint);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break;
 
                     case 'floatle': //Reads a 32-bit float from buf at the specified offset
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeFloatLE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeFloatLE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break
                     case 'float': //Reads a 32-bit float from buf at the specified offset
                     case 'floatbe': //Reads a 32-bit float from buf at the specified offset
                         {
                             const dataSize = 4;
-                            const b = itemReader(item, "writeFloatBE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeFloatBE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break
 
                     case 'doublele': //Reads a 64-bit double from buf at the specified offset
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeDoubleLE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeDoubleLE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break
 
@@ -386,9 +392,9 @@ module.exports = function (RED) {
                     case 'doublebe': //Reads a 64-bit double from buf at the specified offset
                         {
                             const dataSize = 8;
-                            const b = itemReader(item, "writeDoubleBE", dataSize);
-                            bufferExpectedLength += (item.length * dataSize);
-                            buf = appendBuffer(buf, b);
+                            const irResult = itemReader(item, "writeDoubleBE", dataSize);
+                            bufferExpectedLength += (irResult.dataCount * irResult.dataSize);
+                            buf = appendBuffer(buf, irResult.buffer);
                         }
                         break
 

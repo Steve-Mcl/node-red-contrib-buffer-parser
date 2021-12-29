@@ -111,18 +111,17 @@ copies or substantial portions of the Software.
 
         if (typeVal == null || typeVal === 'none') {
             typeVal = def;
-        } else if (typeVal === 'string') {
-            typeVal = "str";
-        } else if (typeVal === 'number') {
-            typeVal = "num";
         }
-        $(typeSel).val(typeVal);
-        $(varSel).typedInput({
+        var ti = $(varSel).typedInput({
             default: def,
             typeField: $(typeSel),
             types: types
         });
-        return $(varSel).typedInput('type', typeVal);
+        if(typeVal) {
+            $(varSel).typedInput('type', typeVal);
+        }
+        //$(typeSel).val(typeVal);
+        return ti;
     }
 
     function getEditItem(index) {
@@ -237,15 +236,22 @@ copies or substantial portions of the Software.
                 options: [
                     { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"' },
                     { label: "object", value: 'object', title: 'Send an object in the msg property specified by "Output property"' },
-                ],
-                default: "value"
+                ]
             }
             sti('data', ['msg', 'json', 'bin'], 'msg');//data
             var specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui');//specification
             var sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap');//specification
             var sw2 = sti('swap2', [swapOpt], 'swap');//specification
             var sw3 = sti('swap3', [swapOpt], 'swap');//specification
-            var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'output');//specification
+            // var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'output');//specification
+            console.log("Setting up node-input-resultType", [returnOpt]);
+            var resultTypeField = $("#node-input-resultType").typedInput({
+                default: "output",
+                type: "output",
+                types: [returnOpt],
+                // typeField: "#node-input-resultTypeType"
+            });
+
             //var msgPropertyField = sti('msgProperty', ['str', 'msg', 'flow', 'global', 'env'], 'str');//specification
             var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
             var multipleResultField = $("#node-input-multipleResult");
@@ -280,7 +286,8 @@ copies or substantial portions of the Software.
             multipleResultField.on("change", function () {
                 var v = this.checked;
                 if (v) {
-                    $("#node-input-resultType").typedInput("types", [returnOpt2]);
+                    console.log("Setting up node-input-result", [returnOpt2]);
+                    resultTypeField.typedInput("types", [returnOpt2]);
                     if($("#node-input-fanOutMultipleResult").prop("checked")) {
                         var l = node.items.length || 1;
                         // console.log("setting outputs to " + l)
@@ -288,7 +295,8 @@ copies or substantial portions of the Software.
                         node.outputs = l;
                     }                    
                 } else {
-                    $("#node-input-resultType").typedInput("types", [returnOpt]);
+                    console.log("Setting up node-input-resultType", [returnOpt]);
+                    resultTypeField.typedInput("types", [returnOpt]);
                     // console.log("setting outputs to " + 1)
                     $("#node-input-outputs").val(1);
                     node.outputs = 1;
@@ -301,10 +309,12 @@ copies or substantial portions of the Software.
                 var v = $(this).val();
                 var t = $(this).typedInput("type");
                 if (t != "swap" || !v || v == "none") {
-                    sw1.typedInput("width", "70%");
+                    console.log('sw1.on("change" --> setting width 70%')
+                    sw1.typedInput("width", "calc(100% - 160px)");
                     sw2.typedInput('hide');
                 } else {
-                    sw1.typedInput("width", "23%");
+                    console.log('sw1.on("change" --> setting width 23%')
+                    sw1.typedInput("width", "calc(34% - 160px)");
                     sw2.typedInput('show');
                 }
                 sw2.change();
@@ -362,8 +372,6 @@ copies or substantial portions of the Software.
                 }
             }
 
-            multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
-            resultTypeField.change();//cause the items list to show/hide depending on selection
             $('#node-input-items-container').css('min-height', '150px').css('min-width', '420px').editableList({
                 addItem: function (container, i, opt) {
                     var rule = opt;
@@ -461,13 +469,13 @@ copies or substantial portions of the Software.
                         .appendTo(row1_1)
                         .typedInput({ types: [_types] })
 
-                    let row1_2 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "145px" })
+                    let row1_2 = $('<div/>', { style: "display:flex;flex-grow:1;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "125px" })
                         .appendTo(row1_2)
                         .typedInput({ types: [{ label: "Name", value: "str" }] })
 
                     let row1_3 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "110px" })
+                    let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "105px" })
                         .appendTo(row1_3)
                         .typedInput({ types: [{ label: "Length", value: "num" }] })
 
@@ -477,7 +485,7 @@ copies or substantial portions of the Software.
                         .typedInput({ types: [{ label: "Offset", value: "num" }] })
 
                     let row1_5 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let maskField = $('<input/>', { class: "node-input-item-property-mask", min: "0", width: "152px" })
+                    let maskField = $('<input/>', { class: "node-input-item-property-mask", min: "0", width: "150px" })
                         .appendTo(row1_5)
                         .typedInput({
                             types: [
@@ -492,12 +500,12 @@ copies or substantial portions of the Software.
                         })
 
                     let row1_6 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let offsetbitField = $('<input/>', { class: "node-input-item-property-offsetbit", type: "number", min: "0", width: "110px" })
+                    let offsetbitField = $('<input/>', { class: "node-input-item-property-offsetbit", type: "number", min: "0", width: "105px" })
                         .appendTo(row1_6)
                         .typedInput({ types: [{ label: "bit offset", value: "num" }] })
 
                     let row1_7 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
-                    let scaleField = $('<input/>', { class: "node-input-item-property-scale", width: "110px" })
+                    let scaleField = $('<input/>', { class: "node-input-item-property-scale", width: "105px" })
                         .appendTo(row1_7)
                         .typedInput({ types: [{ label: "scale", value: "str", icon: "fa fa-calculator"  }] })
 
@@ -561,6 +569,10 @@ copies or substantial portions of the Software.
                 $("#node-input-items-container").editableList('addItem', item);
             }
 
+            multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
+            resultTypeField.change();//cause the items list to show/hide depending on selection
+            $("#node-input-swap1").change(); //cause swap selectors to update
+
         },
         oneditsave: function () {
             var items = $("#node-input-items-container").editableList('items');
@@ -571,6 +583,7 @@ copies or substantial portions of the Software.
                 var r = parseEditItem(rule);
                 node.items.push(r);
             });
+            node.resultType = $("#node-input-resultType").typedInput("type");
             var multipleResult = $("#node-input-multipleResult").prop("checked");
             var fanOutMultipleResult = $("#node-input-fanOutMultipleResult").prop("checked");
             if(multipleResult && fanOutMultipleResult) {
@@ -604,33 +617,33 @@ copies or substantial portions of the Software.
 <script type="text/html" data-template-name="buffer-parser">
     <div class="form-row buffer-parser-form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <input type="text" id="node-input-name" style="width:calc(100% - 160px)" placeholder="Name">
     </div>
     <div class="form-row buffer-parser-form-row">
         <label for="node-input-data"><i class="fa fa-ellipsis-h"></i><span data-i18n="buffer-parser.label.data"> Property</span></label>
         <input type="hidden" id="node-input-dataType">
-        <input style="width: 70%" type="text" id="node-input-data" placeholder="">
+        <input style="width:calc(100% - 160px)" type="text" id="node-input-data" placeholder="">
     </div>
     <div class="form-row buffer-parser-form-row">
         <label for="node-input-specification"><i class="fa fa-code"></i><span data-i18n="buffer-parser.label.specification"> Specification</span></label>
         <input type="hidden" id="node-input-specificationType">
-        <input style="width: 70%" type="text" id="node-input-specification" placeholder="">
+        <input style="width:calc(100% - 160px)" type="text" id="node-input-specification" placeholder="">
     </div>    
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row1">
         <label for="node-input-swap1"><i class="fa fa-exchange"></i><span data-i18n="buffer-parser.label.swap"> Byte swap</span></label>
         <span>
             <input type="hidden" id="node-input-swap1Type">
-            <input style="width: 23%" type="text" id="node-input-swap1" placeholder=""> 
+            <input style="width:calc(100% - 160px)" type="text" id="node-input-swap1" placeholder=""> 
             <input type="hidden" id="node-input-swap2Type">
-            <input style="width: 23%" type="text" id="node-input-swap2" placeholder=""> 
+            <input style="width:calc(33% - 160px)" type="text" id="node-input-swap2" placeholder=""> 
             <input type="hidden" id="node-input-swap3Type">
-            <input style="width: 23%" type="text" id="node-input-swap3" placeholder=""> 
+            <input style="width:calc(33% - 160px)" type="text" id="node-input-swap3" placeholder=""> 
         </span>
     </div>
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row2">
         <label for="node-input-msgProperty"><i class="fa fa-sign-out"></i><span data-i18n="buffer-parser.label.msgProperty"> Output property</span></label>
         <input type="hidden" id="node-input-msgPropertyType">
-        <input style="width: 70%" type="text" id="node-input-msgProperty" placeholder="payload">
+        <input style="width:calc(100% - 160px)" type="text" id="node-input-msgProperty" placeholder="payload">
     </div>
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row3">
         <label><i class="fa fa-sign-out"></i> <span data-i18n="buffer-parser.label.returnOptions"> Output options</span></label>
@@ -650,7 +663,7 @@ copies or substantial portions of the Software.
     <div class="form-row buffer-parser-form-row ui-row" id="ui-row4">
         <label for="node-input-resultType"><i class="fa fa-sign-out"></i><span data-i18n="buffer-parser.label.resultType"> Output</span></label>
         <input type="hidden" id="node-input-resultTypeType">
-        <input style="width: 70%" type="text" id="node-input-resultType" placeholder="value">
+        <input style="width:calc(100% - 160px)" type="text" id="node-input-resultType" placeholder="value">
     </div>
     <div class="form-row buffer-parser-form-row ui-row node-input-items-container-row"  id="ui-row5">
         <ol id="node-input-items-container"></ol>
