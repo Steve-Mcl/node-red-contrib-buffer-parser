@@ -6,7 +6,40 @@ const getTestFlow = (nodeName, resultPayloadPropName) => {
     resultPayloadPropName = resultPayloadPropName ? resultPayloadPropName : "payload";
     return [
         { id: 'helperNode', type: 'helper' },
-        { "id": "testNode", "type": "buffer-maker", "name": nodeName, "msgProperty": resultPayloadPropName, "specification": "spec", "specificationType": "ui", "items": [{ "name": "item1", "type": "byte", "length": 1, "dataType": "num", "data": "1" }, { "name": "item2", "type": "int8", "length": 1, "dataType": "num", "data": "-2" }, { "name": "item3", "type": "uint8", "length": 1, "dataType": "num", "data": "3" }, { "name": "item4", "type": "int16le", "length": 1, "dataType": "num", "data": "-4" }, { "name": "item5", "type": "int16be", "length": 1, "dataType": "num", "data": "-5" }, { "name": "item6", "type": "uint16le", "length": 1, "dataType": "num", "data": "6" }, { "name": "item7", "type": "uint16le", "length": 1, "dataType": "num", "data": "7" }, { "name": "item8", "type": "int32le", "length": 1, "dataType": "num", "data": "-8" }, { "name": "item9", "type": "int32be", "length": 1, "dataType": "num", "data": "-9" }, { "name": "item10", "type": "uint32le", "length": 1, "dataType": "num", "data": "10" }, { "name": "item11", "type": "uint32be", "length": 1, "dataType": "num", "data": "11" }, { "name": "item12", "type": "bigint64le", "length": 1, "dataType": "num", "data": "-120000000000" }, { "name": "item13", "type": "bigint64be", "length": 1, "dataType": "num", "data": "-130000000000" }, { "name": "item14", "type": "biguint64le", "length": 1, "dataType": "num", "data": "14000000000" }, { "name": "item15", "type": "biguint64be", "length": 1, "dataType": "num", "data": "15000000000" }, { "name": "item16", "type": "floatle", "length": 1, "dataType": "num", "data": "16.161616" }, { "name": "item17", "type": "floatbe", "length": 1, "dataType": "num", "data": "17.171717" }, { "name": "item18", "type": "doublele", "length": 1, "dataType": "num", "data": "18.1818e-18" }, { "name": "item19", "type": "doublebe", "length": 1, "dataType": "num", "data": "19.1919e-19" }, { "name": "item20", "type": "8bit", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0]]" }, { "name": "item21", "type": "16bitle", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0,1,0,1,0,0,1,1,0]]" }, { "name": "item22", "type": "16bitbe", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0,1,0,1,0,0,1,1,0]]" }, { "name": "item23", "type": "bcdle", "length": 1, "dataType": "num", "data": "2323" }, { "name": "item24", "type": "bcdbe", "length": 1, "dataType": "num", "data": "2424" }, { "name": "item25", "type": "string", "length": 2, "dataType": "str", "data": "25" }, { "name": "item26", "type": "hex", "length": 4, "dataType": "str", "data": "2626" }, { "name": "item27", "type": "buffer", "length": 24, "dataType": "bin", "data": "[50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50]" }], "swap1": "", "swap2": "", "swap3": "", "swap1Type": "swap", "swap2Type": "swap", "swap3Type": "swap", "msgPropertyType": "str", "wires": [["helperNode"]] }
+        { 
+            "id": "testNode", "type": "buffer-maker", "name": nodeName, "msgProperty": resultPayloadPropName, "specification": "spec", "specificationType": "ui",
+                "items": [
+                    { "name": "item1", "type": "byte", "length": 1, "dataType": "num", "data": "1" },
+                    { "name": "item2", "type": "int8", "length": 1, "dataType": "num", "data": "-2" },
+                    { "name": "item3", "type": "uint8", "length": 1, "dataType": "num", "data": "3" },
+                    { "name": "item4", "type": "int16le", "length": 1, "dataType": "num", "data": "-4" },
+                    { "name": "item5", "type": "int16be", "length": 1, "dataType": "num", "data": "-5" },
+                    { "name": "item6", "type": "uint16le", "length": 1, "dataType": "num", "data": "6" },
+                    { "name": "item7", "type": "uint16le", "length": 1, "dataType": "num", "data": "7" },
+                    { "name": "item8", "type": "int32le", "length": 1, "dataType": "num", "data": "-8" },
+                    { "name": "item9", "type": "int32be", "length": 1, "dataType": "num", "data": "-9" },
+                    { "name": "item10", "type": "uint32le", "length": 1, "dataType": "num", "data": "10" },
+                    { "name": "item11", "type": "uint32be", "length": 1, "dataType": "num", "data": "11" },
+                    { "name": "item12", "type": "bigint64le", "length": 1, "dataType": "num", "data": "-120000000000" },
+                    { "name": "item13", "type": "bigint64be", "length": 1, "dataType": "num", "data": "-130000000000" },
+                    { "name": "item14", "type": "biguint64le", "length": 1, "dataType": "num", "data": "14000000000" },
+                    { "name": "item15", "type": "biguint64be", "length": 1, "dataType": "num", "data": "15000000000" },
+                    { "name": "item16", "type": "floatle", "length": 1, "dataType": "num", "data": "16.161616" },
+                    { "name": "item17", "type": "floatbe", "length": 1, "dataType": "num", "data": "17.171717" },
+                    { "name": "item18", "type": "doublele", "length": 1, "dataType": "num", "data": "18.1818e-18" },
+                    { "name": "item19", "type": "doublebe", "length": 1, "dataType": "num", "data": "19.1919e-19" },
+                    { "name": "item20", "type": "8bit", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0]]" },
+                    { "name": "item21", "type": "16bitle", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0,1,0,1,0,0,1,1,0]]" },
+                    { "name": "item22", "type": "16bitbe", "length": 1, "dataType": "jsonata", "data": "[[1,0,1,0,0,1,1,0,1,0,1,0,0,1,1,0]]" },
+                    { "name": "item23", "type": "bcdle", "length": 1, "dataType": "num", "data": "2323" },
+                    { "name": "item24", "type": "bcdbe", "length": 1, "dataType": "num", "data": "2424" },
+                    { "name": "item25", "type": "string", "length": 2, "dataType": "str", "data": "25" },
+                    { "name": "item26", "type": "hex", "length": 4, "dataType": "str", "data": "2626" },
+                    { "name": "item27", "type": "buffer", "length": 24, "dataType": "bin", "data": "[50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50]" }
+                ], 
+                "swap1": "", "swap2": "", "swap3": "", "swap1Type": "swap", "swap2Type": "swap", "swap3Type": "swap", "msgPropertyType": "str", 
+                "wires": [["helperNode"]] 
+        }
     ];
 };
 
