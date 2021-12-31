@@ -103,25 +103,101 @@ copies or substantial portions of the Software.
     function coerceDataType(t) {
         return compatibleDataTypes[t] || t;
     }
-    function setupTypedInput(varName, types, def) {
-        let varSel = '#node-input-' + varName;
-        let typeSel = varSel + 'Type';
-        let varVal = this[varName];
-        let typeVal = this[varName + 'Type'];
+    function setupTypedInput(varName, allowableTypes, defType, defVal, isOptional, width) {
+        var node = this;
+        console.log("setupTypedInput", varName, allowableTypes, defType, defVal, isOptional, width);
+        //TODO: move to common library
+        function isObject(val) {
+            if (val === null) { return false; }
+            return (typeof val === 'object');
+        };
+        function isNumeric(n) {
+            return n !== '' && !isNaN(parseFloat(n)) && isFinite(n);
+        };
+        function isTypeInArray(arr, findType) {
+            try {
+                var typeToFind = findType;
+                if (isObject(findType))
+                    typeToFind = findType.value;
+                for (var index = 0; index < arr.length; index++) {
+                    var element = arr[index];
+                    var thisType = isObject(element) ? element.value : element;
+                    if (thisType === typeToFind) return true;
+                }
+            } catch (error) { }
+            return false;
+        }
 
-        if (typeVal == null || typeVal === 'none') {
-            typeVal = def;
+        var varSel = "#node-input-" + varName;
+        var typeSel = varSel + "Type";
+        var currentValue = node[varName];
+        var currentType = node[varName + "Type"];
+        var defShouldHaveNoValue = false;
+        //if optional but 'none' is not yet an option - add it as first option in allowableTypes
+        if (isOptional === true) {
+            if (!isTypeInArray(allowableTypes, "none")) {
+                allowableTypes.unshift("none");
+            }
         }
-        var ti = $(varSel).typedInput({
-            default: def,
-            typeField: $(typeSel),
-            types: types
-        });
-        if(typeVal) {
-            $(varSel).typedInput('type', typeVal);
+
+        //if defType is not in the list of parameter type, change defType to 1st item
+        if (!isTypeInArray(allowableTypes, defType)) {
+            var _firstType = allowableTypes[0];
+            if (isObject(_firstType)) {
+                _firstType = _firstType.value;
+                defShouldHaveNoValue = _firstType.hasValue == false;
+            }
+            defType = _firstType;
         }
-        //$(typeSel).val(typeVal);
-        return ti;
+
+        //if currently set type is not in the list of parameter types, set currentType to defType
+        if (!isTypeInArray(allowableTypes, currentType)) {
+            currentType = defType;
+        }
+
+        //catch all
+        if (!currentType) {
+            currentType = defType || "";
+        }
+
+        var $ti = $(varSel);
+        var alreadyBuilt = $ti.data("built") == true;
+        if (alreadyBuilt) {
+            //already built? just update types :)
+            $ti.typedInput("types", allowableTypes);
+        } else {
+            var opts = {
+                default: defType,
+                typeField: $(typeSel),
+                types: allowableTypes
+            };
+            if (isOptional) {
+                opts.default = defType || "none";
+                opts.validate = function (v) {
+                    //todo - handle this when spec changes
+                    return !!v;
+                };
+            }
+            $ti.typedInput(opts);
+            $ti.data("built", true);
+        }
+
+        if (currentType == "bool") {
+            $ti.typedInput("value", (currentValue === true || currentValue === "true") ? "true" : "false");
+        } else if (currentValue) {
+            if (currentType == "num" && !isNumeric(currentValue)) {
+                currentType = defType
+                currentValue = defVal || "";
+            }
+        } else {
+            currentType = defVal || "";
+        }
+
+        $ti.typedInput("type", currentType);
+        $ti.typedInput("value", currentValue);
+
+        if (width) $ti.typedInput("width", width);
+        return $ti;
     }
 
     function getEditItem(index) {
@@ -263,8 +339,12 @@ copies or substantial portions of the Software.
                 if (t == "ui") {
                     $(".ui-row").show();
                     if (!v) specificationField.typedInput("value", "spec")
+                    console.log("calling RED.tray.resize();")
+                    RED.tray.resize();
                 } else {
                     $(".ui-row").hide();
+                    console.log("calling RED.tray.resize();")
+                    RED.tray.resize();
                 }
             });
             resultTypeField.on("change", function () {
@@ -572,7 +652,8 @@ copies or substantial portions of the Software.
             multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
             resultTypeField.change();//cause the items list to show/hide depending on selection
             $("#node-input-swap1").change(); //cause swap selectors to update
-
+            console.log("calling RED.tray.resize();")
+            RED.tray.resize();
         },
         oneditsave: function () {
             var items = $("#node-input-items-container").editableList('items');
