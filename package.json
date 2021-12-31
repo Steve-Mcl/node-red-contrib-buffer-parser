@@ -24,10 +24,14 @@
         "name": "Steve-Mcl"
     },
     "node-red": {
+        "version": ">=0.20.0",
         "nodes": {
             "buffer-parser": "buffer-parser.js",
             "buffer-maker": "buffer-maker.js"
         }
+    },
+    "engines": {
+        "node" : ">=10.4.0"
     },
     "bugs": {
         "url": "https://github.com/Steve-Mcl/node-red-contrib-buffer-parser/issues"
