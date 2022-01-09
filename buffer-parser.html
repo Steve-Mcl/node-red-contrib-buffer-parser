@@ -182,15 +182,8 @@ copies or substantial portions of the Software.
             $ti.data("built", true);
         }
 
-        if (currentType == "bool") {
-            $ti.typedInput("value", (currentValue === true || currentValue === "true") ? "true" : "false");
-        } else if (currentValue) {
-            if (currentType == "num" && !isNumeric(currentValue)) {
-                currentType = defType
-                currentValue = defVal || "";
-            }
-        } else {
-            currentType = defVal || "";
+        if (currentValue && currentType == "bool") {
+            currentValue  = (currentValue === true || currentValue === "true") ? "true" : "false";
         }
 
         $ti.typedInput("type", currentType);
@@ -554,17 +547,17 @@ copies or substantial portions of the Software.
                         .appendTo(row1_2)
                         .typedInput({ types: [{ label: "Name", value: "str" }] })
 
-                    let row1_3 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let row1_3 = $('<div/>', { style: "display:flex;flex-grow:0.15;", class: "buffer-parser-row-item" }).appendTo(row1);
                     let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "105px" })
                         .appendTo(row1_3)
                         .typedInput({ types: [{ label: "Length", value: "num" }] })
 
-                    let row1_4 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let row1_4 = $('<div/>', { style: "display:flex;flex-grow:0.15;", class: "buffer-parser-row-item" }).appendTo(row1);
                     let offsetField = $('<input/>', { class: "node-input-item-property-offset", type: "number", min: "0", width: "100px" })
                         .appendTo(row1_4)
                         .typedInput({ types: [{ label: "Offset", value: "num" }] })
 
-                    let row1_5 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let row1_5 = $('<div/>', { style: "display:flex;flex-grow:0.15;", class: "buffer-parser-row-item" }).appendTo(row1);
                     let maskField = $('<input/>', { class: "node-input-item-property-mask", min: "0", width: "150px" })
                         .appendTo(row1_5)
                         .typedInput({
@@ -579,12 +572,12 @@ copies or substantial portions of the Software.
                             default: ""
                         })
 
-                    let row1_6 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let row1_6 = $('<div/>', { style: "display:flex;flex-grow:0.15;", class: "buffer-parser-row-item" }).appendTo(row1);
                     let offsetbitField = $('<input/>', { class: "node-input-item-property-offsetbit", type: "number", min: "0", width: "105px" })
                         .appendTo(row1_6)
                         .typedInput({ types: [{ label: "bit offset", value: "num" }] })
 
-                    let row1_7 = $('<div/>', { style: "display:flex;", class: "buffer-parser-row-item" }).appendTo(row1);
+                    let row1_7 = $('<div/>', { style: "display:flex;flex-grow:0.15;", class: "buffer-parser-row-item" }).appendTo(row1);
                     let scaleField = $('<input/>', { class: "node-input-item-property-scale", width: "105px" })
                         .appendTo(row1_7)
                         .typedInput({ types: [{ label: "scale", value: "str", icon: "fa fa-calculator"  }] })

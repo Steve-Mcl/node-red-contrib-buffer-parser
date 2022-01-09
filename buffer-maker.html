@@ -114,15 +114,8 @@ copies or substantial portions of the Software.
             $ti.data("built", true);
         }
 
-        if (currentType == "bool") {
-            $ti.typedInput("value", (currentValue === true || currentValue === "true") ? "true" : "false");
-        } else if (currentValue) {
-            if (currentType == "num" && !isNumeric(currentValue)) {
-                currentType = defType
-                currentValue = defVal || "";
-            }
-        } else {
-            currentType = defVal || "";
+        if (currentValue && currentType == "bool") {
+            currentValue  = (currentValue === true || currentValue === "true") ? "true" : "false";
         }
 
         $ti.typedInput("type", currentType);
