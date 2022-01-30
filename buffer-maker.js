@@ -535,7 +535,8 @@ module.exports = function (RED) {
                             const _end = length === -1 ? undefined : length;
                             if (!(item.value instanceof Buffer)) throw new Error(`Expected value of '${itemDesc}' to be a Buffer`)
                             const b = item.value.slice(0, _end);
-                            bufferExpectedLength += length;
+                            const _length = _end || b.length;
+                            bufferExpectedLength += _length;
                             buf = appendBuffer(buf, b);
                         }
                         break;
