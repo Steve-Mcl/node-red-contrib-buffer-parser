@@ -28,9 +28,43 @@ describe('buffer-parser Node', function(){
         const flow = [{"id":"testNode","type":"buffer-parser","name":"test--buffer-parser","specification":"spec","specificationType":"ui","items":[{"name":"item1","type":"byte","length":1,"dataType":"num","data":"1"},{"name":"item2","type":"int8","length":1,"dataType":"num","data":"-2"},{"name":"item3","type":"uint8","length":1,"dataType":"num","data":"3"},{"name":"item4","type":"int16le","length":1,"dataType":"num","data":"-4"},{"name":"item5","type":"uint16le","length":1,"dataType":"num","data":"5"},{"name":"item6","type":"uint16le","length":1,"dataType":"num","data":"6"}],"swap1":"","swap2":"","swap3":"","swap1Type":"swap","swap2Type":"swap","swap3Type":"swap","msgProperty":"payload","msgPropertyType":"str"}]
         helper.load(bufferParser, flow, () => {
             try {
-                const n = helper.getNode('testNode');
-                n.should.have.property('name', 'test--buffer-parser');
+                const testNode = helper.getNode('testNode');
+                testNode.should.have.property('name', 'test--buffer-parser');
                 done();  
+            } catch (error) {
+                done(error);
+            }
+            
+        });
+    });
+
+    it('should make BigInt values with and without mask', done => {
+        const flow = [{ id: 'helperNode1', type: 'helper' }, {"id":"testNode","type":"buffer-parser","name":"test--buffer-parser","data":"payload","dataType":"msg","specification":"spec","specificationType":"ui","items":[{"type":"bigint64be","name":"MASK_00000001FFFFFFFF","offset":0,"length":1,"offsetbit":0,"scale":"1","mask":"0x00000001FFFFFFFF"},{"type":"bigint64be","name":"MASK_000001FFFFFFFFFF","offset":0,"length":1,"offsetbit":0,"scale":"1","mask":"0x000001FFFFFFFFFF"},{"type":"bigint64be","name":"MASK_0001FFFFFFFFFFFF","offset":0,"length":1,"offsetbit":0,"scale":"1","mask":"0x0001FFFFFFFFFFFF"},{"type":"bigint64be","name":"MASK_000FFFFFFFFFFFFF","offset":0,"length":1,"offsetbit":0,"scale":"1","mask":"0x000FFFFFFFFFFFFF"},{"type":"bigint64be","name":"NO_MASK","offset":0,"length":1,"offsetbit":0,"scale":"1","mask":""}],"swap1":"","swap2":"","swap3":"","swap1Type":"swap","swap2Type":"swap","swap3Type":"swap","msgProperty":"payload","msgPropertyType":"str","resultType":"keyvalue","resultTypeType":"return","multipleResult":false,"fanOutMultipleResult":false,"setTopic":true,"outputs":1,"wires":[["helperNode1"]]}]
+        helper.load(bufferParser, flow, () => {
+            try {
+                const testNode = helper.getNode('testNode');
+                const helperNode1 = helper.getNode("helperNode1");
+
+                helperNode1.on("input", function (msg) { 
+                    try {
+                        msg.should.have.property("payload");
+                        msg.payload.should.have.property("MASK_00000001FFFFFFFF");
+                        msg.payload.should.have.property("MASK_000001FFFFFFFFFF");
+                        msg.payload.should.have.property("MASK_0001FFFFFFFFFFFF");
+                        msg.payload.should.have.property("MASK_000FFFFFFFFFFFFF");
+                        msg.payload.should.have.property("NO_MASK");
+                        msg.payload.MASK_00000001FFFFFFFF.should.eql(8589934591n);
+                        msg.payload.MASK_000001FFFFFFFFFF.should.eql(2199023255551n);
+                        msg.payload.MASK_0001FFFFFFFFFFFF.should.eql(562949953421311n);
+                        msg.payload.MASK_000FFFFFFFFFFFFF.should.eql(4503599627370495n);
+                        msg.payload.NO_MASK.should.eql(4503599627370495n);
+                        done();
+                    } catch(err) {
+                        done(err);
+                    }               
+                });
+                testNode.should.have.property('name', 'test--buffer-parser');
+                testNode.receive({ payload: Buffer.from([0,15,255,255,255,255,255,255]) }); //fire input of testNode with a buffer of 0x000FFFFFFFFFFFFF (4503599627370495)
             } catch (error) {
                 done(error);
             }
@@ -103,8 +137,8 @@ describe('buffer-parser Node', function(){
     /*
     * all functions
     * all output types
-    * byteswaps
-    * scalling operators
+    * byte swaps
+    * scaling operators
     * dynamic spec
     */
 });

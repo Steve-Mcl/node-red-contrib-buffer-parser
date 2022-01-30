@@ -35,7 +35,8 @@ const getTestFlow = (nodeName, resultPayloadPropName) => {
                     { "name": "item24", "type": "bcdbe", "length": 1, "dataType": "num", "data": "2424" },
                     { "name": "item25", "type": "string", "length": 2, "dataType": "str", "data": "25" },
                     { "name": "item26", "type": "hex", "length": 4, "dataType": "str", "data": "2626" },
-                    { "name": "item27", "type": "buffer", "length": 24, "dataType": "bin", "data": "[50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50]" }
+                    { "name": "item27", "type": "buffer", "length": 24, "dataType": "bin", "data": "[50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55]" },
+                    { "name": "item28", "type": "buffer", "length": -1, "dataType": "bin", "data": "[50,55,50,55]" }
                 ], 
                 "swap1": "", "swap2": "", "swap3": "", "swap1Type": "swap", "swap2Type": "swap", "swap3Type": "swap", "msgPropertyType": "str", 
                 "wires": [["helperNode"]] 
@@ -85,7 +86,7 @@ describe('buffer-maker Node', function(){
                         /** @type {should.Assertion} */ var rp = msg.should.have.propertyByPath(...resultProp.split(".")).obj;//get the nested property
                         rp.should.be.an.Object()
                         rp.should.instanceOf(Buffer);
-                        var expectedPayload = Buffer.from([1,254,3,252,255,255,251,6,0,7,0,248,255,255,255,255,255,255,247,10,0,0,0,0,0,0,11,0,80,113,15,228,255,255,255,255,255,255,225,187,101,108,0,0,12,119,66,3,0,0,0,0,0,0,3,126,17,214,0,253,74,129,65,65,137,95,173,159,29,121,247,81,246,116,60,60,65,179,143,43,255,224,32,101,101,101,101,101,35,35,36,36,50,53,38,38,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55]).toString("hex");
+                        var expectedPayload = Buffer.from([1,254,3,252,255,255,251,6,0,7,0,248,255,255,255,255,255,255,247,10,0,0,0,0,0,0,11,0,80,113,15,228,255,255,255,255,255,255,225,187,101,108,0,0,12,119,66,3,0,0,0,0,0,0,3,126,17,214,0,253,74,129,65,65,137,95,173,159,29,121,247,81,246,116,60,60,65,179,143,43,255,224,32,101,101,101,101,101,35,35,36,36,50,53,38,38,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55,50,55]).toString("hex");
                         rp.toString("hex").should.equal(expectedPayload);
                         done();
                     } catch (error) {
