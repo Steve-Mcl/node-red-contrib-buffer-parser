@@ -362,7 +362,7 @@ module.exports = function (RED) {
             }
             //helper function to return 1 or more correctly formatted values from the buffer
             function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask, scaler) {
-                const numberConvertor = bufferFunction.indexOf("BigInt") > 0 ? BigInt : Number
+                const numberConvertor = bufferFunction.indexOf("readBig") == 0 ? BigInt : Number
                 const _mask = sanitizeMask(mask, numberConvertor, true);
                 let index = 0;
                 let value;
