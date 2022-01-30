@@ -16,6 +16,7 @@ copies or substantial portions of the Software.
 */
 
 module.exports = function (RED) {
+    const SUPPORTS_BIGINT = parseFloat(process.versions.node) >= 10.4;
     const RESULTYPEOPTS = ["object", "keyvalue", "value", "array", "buffer"];
     const { setObjectProperty, bcd2number, byteToBits, wordToBits, isNumber, TYPEOPTS, SWAPOPTS } = require('./common-functions.js');
     const scalingOps = {
@@ -342,14 +343,15 @@ module.exports = function (RED) {
                 result.arrayResults.push(item);
                 result.values.push(item.value);
             }
-            function sanitizeMask(mask, throwError) {
-                var _mask = mask
+            function sanitizeMask(mask, numberFn, throwError) {
+                let _mask = mask
                 try {
                     if (_mask) {
-                        if (typeof _mask == "string" && _mask.trim() != "") {
-                            _mask = Number(_mask)
+                        if (typeof _mask == "string" && _mask.trim() == "") {
+                            return 0;
                         }
-                        if (isNaN(_mask)) {
+                        _mask = numberFn(_mask)
+                        if (isNaN(Number(_mask))) {
                             if (throwError) throw new Error("mask " + mask + " is invalid")
                         }
                     }
@@ -360,7 +362,8 @@ module.exports = function (RED) {
             }
             //helper function to return 1 or more correctly formatted values from the buffer
             function dataGetter(buffer, startByte, dataCount, bufferFunction, dataSize, mask, scaler) {
-                var _mask = sanitizeMask(mask);
+                const numberConvertor = bufferFunction.indexOf("BigInt") > 0 ? BigInt : Number
+                const _mask = sanitizeMask(mask, numberConvertor, true);
                 let index = 0;
                 let value;
                 if (dataCount === -1) {
@@ -372,11 +375,13 @@ module.exports = function (RED) {
                 if (buffer[bufferFunction] == null) {
                     throw new Error(`Unknown Buffer method '${bufferFunction}'`);
                 }
-                var fn = buffer[bufferFunction].bind(buffer);
+                const fn = buffer[bufferFunction].bind(buffer);
                 for (index = 0; index < dataCount; index++) {
-                    let bufPos = startByte + (index * dataSize);
+                    const bufPos = startByte + (index * dataSize);
                     let val = fn(bufPos);//call specified function on the buffer
-                    if (_mask) val = (val & _mask);
+                    if (_mask != 0) {
+                        val = (val & _mask);
+                    }
                     if (scaler && scaler.operator && scalingOps[scaler.operator]) {
                         val = scalingOps[scaler.operator](val, scaler.operand);
                     }
@@ -451,19 +456,31 @@ module.exports = function (RED) {
                         break;
 
                     case 'bigint64le':
+                        if(!SUPPORTS_BIGINT) {
+                            throw new Error("BigInt operations require NODE v10.4.0 or greater")
+                        }
                         itemReader(item, buf, "readBigInt64LE", 8);
                         break;
 
                     case 'bigint64':
                     case 'bigint64be':
+                        if(!SUPPORTS_BIGINT) {
+                            throw new Error("BigInt operations require NODE v10.4.0 or greater")
+                        }
                         itemReader(item, buf, "readBigInt64BE", 8);
                         break;
 
                     case 'biguint64le':
+                        if(!SUPPORTS_BIGINT) {
+                            throw new Error("BigInt operations require NODE v10.4.0 or greater")
+                        }
                         itemReader(item, buf, "readBigUInt64LE", 8);
                         break;
                     case 'biguint64':
                     case 'biguint64be':
+                        if(!SUPPORTS_BIGINT) {
+                            throw new Error("BigInt operations require NODE v10.4.0 or greater")
+                        }
                         itemReader(item, buf, "readBigUInt64BE", 8);
                         break;
 
