@@ -693,7 +693,10 @@ module.exports = function (RED) {
                 let results = maker(validatedSpec, msg);
                 if (validatedSpec.options.singleResult !== false) {
                     msg.specification = results.specification;
-                    setObjectProperty(msg, validatedSpec.options.msgProperty, results.buffer, ".")
+                    const setOk = RED.util.setObjectProperty(msg, validatedSpec.options.msgProperty, results.buffer, true);
+                    if(!setOk) {
+                        throw new Error("Unable to set output property");
+                    }
                     node.send(msg);
                 }
 
