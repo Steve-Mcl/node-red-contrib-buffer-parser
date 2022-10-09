@@ -105,7 +105,7 @@ copies or substantial portions of the Software.
     }
     function setupTypedInput(varName, allowableTypes, defType, defVal, isOptional, width) {
         var node = this;
-        console.log("setupTypedInput", varName, allowableTypes, defType, defVal, isOptional, width);
+        //console.log("setupTypedInput", varName, allowableTypes, defType, defVal, isOptional, width);
         //TODO: move to common library
         function isObject(val) {
             if (val === null) { return false; }
@@ -283,7 +283,7 @@ copies or substantial portions of the Software.
                 ],
                 default: "none"
             }
-            var returnOpt = {
+            const resultOptsSingleOutput = {
                 value: "output",
                 label: "output",
                 title: "output",
@@ -295,9 +295,10 @@ copies or substantial portions of the Software.
                     { label: "array (of objects)", value: 'array', title: 'Send an array of objects in the msg property specified by "Output property"' },
                     { label: "buffer", value: 'buffer', title: 'Send a buffer in the msg property specified by "Output property"' },
                 ],
-                default: "value"
+                default: "output",
+                defaultOption: "keyvalue"
             }
-            var returnOpt2 = {
+            const resultOptsMultiOutputs = {
                 value: "output",
                 label: "output",
                 title: "output",
@@ -305,7 +306,9 @@ copies or substantial portions of the Software.
                 options: [
                     { label: "value only", value: 'value', title: 'Send a value in the msg property specified by "Output property"' },
                     { label: "object", value: 'object', title: 'Send an object in the msg property specified by "Output property"' },
-                ]
+                ],
+                default: "output",
+                defaultOption: "value"
             }
             sti('data', ['msg', 'json', 'bin'], 'msg');//data
             var specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui');//specification
@@ -313,13 +316,23 @@ copies or substantial portions of the Software.
             var sw2 = sti('swap2', [swapOpt], 'swap');//specification
             var sw3 = sti('swap3', [swapOpt], 'swap');//specification
             // var resultTypeField = sti('resultType', [returnOpt, 'msg', 'flow', 'global', 'env'], 'output');//specification
-            console.log("Setting up node-input-resultType", [returnOpt]);
-            var resultTypeField = $("#node-input-resultType").typedInput({
-                default: "output",
-                type: "output",
-                types: [returnOpt],
-                // typeField: "#node-input-resultTypeType"
-            });
+
+            let resultTypeField;
+            if(node.fanOutMultipleResult == true) {
+                resultTypeField = $("#node-input-resultType").typedInput({
+                    default: resultOptsMultiOutputs.default,
+                    type: resultOptsMultiOutputs.default,
+                    optionValue: node.resultType || resultOptsMultiOutputs.defaultOption,
+                    types: [resultOptsMultiOutputs],
+                });
+            } else {
+                resultTypeField = $("#node-input-resultType").typedInput({
+                    default: resultOptsSingleOutput.default,
+                    type: resultOptsSingleOutput.default,
+                    optionValue: node.resultType || resultOptsSingleOutput.defaultOption,
+                    types: [resultOptsSingleOutput],
+                });
+            }
 
             //var msgPropertyField = sti('msgProperty', ['str', 'msg', 'flow', 'global', 'env'], 'str');//specification
             var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
@@ -332,11 +345,11 @@ copies or substantial portions of the Software.
                 if (t == "ui") {
                     $(".ui-row").show();
                     if (!v) specificationField.typedInput("value", "spec")
-                    console.log("calling RED.tray.resize();")
+                    //console.log("calling RED.tray.resize();")
                     RED.tray.resize();
                 } else {
                     $(".ui-row").hide();
-                    console.log("calling RED.tray.resize();")
+                    //console.log("calling RED.tray.resize();")
                     RED.tray.resize();
                 }
             });
@@ -358,35 +371,43 @@ copies or substantial portions of the Software.
             });
             multipleResultField.on("change", function () {
                 var v = this.checked;
+                let resultTypes;
                 if (v) {
-                    console.log("Setting up node-input-result", [returnOpt2]);
-                    resultTypeField.typedInput("types", [returnOpt2]);
+                    resultTypes = resultOptsMultiOutputs;
                     if($("#node-input-fanOutMultipleResult").prop("checked")) {
                         var l = node.items.length || 1;
-                        // console.log("setting outputs to " + l)
                         $("#node-input-outputs").val(l);
                         node.outputs = l;
                     }                    
                 } else {
-                    console.log("Setting up node-input-resultType", [returnOpt]);
-                    resultTypeField.typedInput("types", [returnOpt]);
-                    // console.log("setting outputs to " + 1)
+                    resultTypes = resultOptsSingleOutput;
                     $("#node-input-outputs").val(1);
                     node.outputs = 1;
                 }
                 $("#node-input-setTopic").prop("disabled", !v);
                 $("#node-input-fanOutMultipleResult").prop("disabled", !v);
+                //change resultTypeField options based on selection of multipleResultField
+                const currentResType = resultTypeField.typedInput("type");
+                resultTypeField.typedInput("types", [resultTypes]);
+                var opts = resultTypes.options.map(function(opt) {
+                    return opt.value 
+                });
+                if(opts.indexOf(currentResType) >= 0) {
+                    resultTypeField.typedInput("type", currentResType);
+                } else {
+                    resultTypeField.typedInput("type", resultTypes.default);
+                }
             });
 
             sw1.on("change", function () {
                 var v = $(this).val();
                 var t = $(this).typedInput("type");
                 if (t != "swap" || !v || v == "none") {
-                    console.log('sw1.on("change" --> setting width 70%')
+                    //console.log('sw1.on("change" --> setting width 70%')
                     sw1.typedInput("width", "calc(100% - 160px)");
                     sw2.typedInput('hide');
                 } else {
-                    console.log('sw1.on("change" --> setting width 23%')
+                    //console.log('sw1.on("change" --> setting width 23%')
                     sw1.typedInput("width", "calc(34% - 160px)");
                     sw2.typedInput('show');
                 }
@@ -645,7 +666,7 @@ copies or substantial portions of the Software.
             multipleResultField.change();//cause setTopic to be enabled/disabled appropriately
             resultTypeField.change();//cause the items list to show/hide depending on selection
             $("#node-input-swap1").change(); //cause swap selectors to update
-            console.log("calling RED.tray.resize();")
+            //console.log("calling RED.tray.resize();")
             RED.tray.resize();
         },
         oneditsave: function () {
@@ -662,11 +683,11 @@ copies or substantial portions of the Software.
             var fanOutMultipleResult = $("#node-input-fanOutMultipleResult").prop("checked");
             if(multipleResult && fanOutMultipleResult) {
                 var l = items.length || 1;
-                // console.log("setting outputs to " + l)
+                // //console.log("setting outputs to " + l)
                 $("#node-input-outputs").val(l);
                 node.outputs = l;
             } else {
-                // console.log("setting outputs to " + 1)
+                // //console.log("setting outputs to " + 1)
                 $("#node-input-outputs").val(1);
                 node.outputs = 1;
             }
