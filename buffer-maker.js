@@ -211,6 +211,10 @@ module.exports = function (RED) {
                 },
                 lengthMod: {
                     "hex": 2
+                },
+                variableLength: {
+                    "uft8": 4,
+                    "uft-8": 4
                 }
             }
             for (var itemIndex = 0; itemIndex < itemCount; itemIndex++) {
@@ -409,11 +413,28 @@ module.exports = function (RED) {
                     case "latin1":
                     case "binary":
                         {
+                            function byteLengthOfUTF8(str) {
+                                // returns the byte length of an utf8 string
+                                var s = str.length;
+                                for (var i=str.length-1; i>=0; i--) {
+                                  var code = str.charCodeAt(i);
+                                  if (code > 0x7f && code <= 0x7ff) s++;
+                                  else if (code > 0x7ff && code <= 0xffff) s+=2;
+                                  if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+                                }
+                                return s;
+                              }
+
                             const dataSize = 1;
-                            const _end = length === -1 ? undefined : length;
+                            let _end = length === -1 ? undefined : length;
                             let itemValue = item.value;
-                            const _length = _end || itemValue.length;
+                            let _length = _end || itemValue.length;
                             const lengthMod = options.lengthMod[type.toLowerCase()];
+                            const variable = options.variableLength[type.toLowerCase()];
+                            if(variable) {
+                                let itemByteLength  = variable ? byteLengthOfUTF8(item.value) : item.value.length;
+                                _length = _end || itemByteLength;
+                            }
                             if (lengthMod) {
                                 let m = _length % lengthMod;
                                 if (m) throw new Error(`Length of '${itemDesc}' should be divisible by ${lengthMod}`);
